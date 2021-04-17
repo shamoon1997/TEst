@@ -1,3 +1,4 @@
+/* eslint-disable prefer-template */
 /* eslint-disable no-undef */
 /* eslint-disable eqeqeq */
 /* eslint-disable array-callback-return */
@@ -11,6 +12,8 @@ import {
 import { v4 as uuid } from 'uuid';
 import global from 'src/utils/global';
 import getInitials from 'src/utils/getInitials';
+import parse from 'src/utils/parse';
+import humanFriendlyDate from 'src/utils/Timeformat';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CustomerMsg = ({ content }) => {
+const CustomerMsg = ({ content, selectUser }) => {
   const classes = useStyles();
 
   return (
@@ -48,21 +51,22 @@ const CustomerMsg = ({ content }) => {
     >
       <Avatar
         className={classes.avatar}
-        src={content.u_avatar ? `${global.serverUrl}upload/${content.u_avatar}` : null}
+        src={selectUser.u_avatar ? `${global.serverUrl}upload/${selectUser.u_avatar}` : null}
         alt="N"
       >
-        {getInitials(content.clt_name)}
+        {getInitials(selectUser.u_name)}
       </Avatar>
       <div>
-        <div className="customer-content">{content.msg_content}</div>
-        <div>{content.created_at}</div>
+        <div className="customer-content">{parse(content.m_content)}</div>
+        <div className={humanFriendlyDate(content.m_created_at) == 'just now' ? 'new-msg' : null}>{humanFriendlyDate(content.m_created_at)}</div>
       </div>
     </div>
   );
 };
 
 CustomerMsg.propTypes = {
-  content: PropTypes.object
+  content: PropTypes.object,
+  selectUser: PropTypes.object,
 };
 
 export default CustomerMsg;

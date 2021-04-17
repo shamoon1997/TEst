@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -63,14 +63,13 @@ const useStyles = makeStyles(() => ({
 const NavBar = ({ onMobileClose, openMobile }) => {
   const classes = useStyles();
   const location = useLocation();
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [userName, setUserName] = useState('');
+  const [profile, setProfile] = React.useState({});
   useEffect(() => {
     const currentUser = localStorage.getItem('brainaly_user');
     const userObject = JSON.parse(currentUser);
-    setAvatarUrl(userObject?.userAvatar);
-    setUserName(userObject?.userName);
-  });
+    setProfile(userObject);
+    console.log(profile);
+  }, []);
   useEffect(() => {
     if (openMobile && onMobileClose) {
       onMobileClose();
@@ -92,16 +91,19 @@ const NavBar = ({ onMobileClose, openMobile }) => {
         <Avatar
           className={classes.avatar}
           component={RouterLink}
-          src={avatarUrl ? `${global.serverUrl}upload/${avatarUrl}` : null}
+          src={`${global.serverUrl}upload/${profile.userAvatar}`}
           to="/teacher/account"
         />
-        <Typography
-          className={classes.name}
-          color="textPrimary"
-          variant="h5"
-        >
-          {userName}
-        </Typography>
+        <div className="badge-container">
+          <Typography
+            className={classes.name}
+            color="textPrimary"
+            variant="h5"
+          >
+            {profile.userName}
+          </Typography>
+          <img src={`../static/${profile.userBadge}.png`} alt="badge" className="badge" />
+        </div>
       </Box>
       <Divider />
       <Box p={2}>

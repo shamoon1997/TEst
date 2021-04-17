@@ -18,12 +18,6 @@ import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import ChatIcon from '@material-ui/icons/Chat';
 import NavItem from './NavItem';
 
-const user = {
-  avatar: '/static/images/avatars/avatar_6.png',
-  jobTitle: 'Senior Developer',
-  name: 'Katarina Smith'
-};
-
 const items = [
   {
     href: '/teacher/home',
@@ -67,7 +61,13 @@ const useStyles = makeStyles(() => ({
 const NavBar = ({ onMobileClose, openMobile }) => {
   const classes = useStyles();
   const location = useLocation();
-
+  const [profile, setProfile] = React.useState({});
+  useEffect(() => {
+    const currentUser = localStorage.getItem('brainaly_user');
+    const userObject = JSON.parse(currentUser);
+    setProfile(userObject);
+    console.log(profile);
+  }, []);
   useEffect(() => {
     if (openMobile && onMobileClose) {
       onMobileClose();
@@ -90,22 +90,19 @@ const NavBar = ({ onMobileClose, openMobile }) => {
         <Avatar
           className={classes.avatar}
           component={RouterLink}
-          src={user.avatar}
+          src={`${global.serverUrl}upload/${profile.userAvatar}`}
           to="/app/account"
         />
-        <Typography
-          className={classes.name}
-          color="textPrimary"
-          variant="h5"
-        >
-          {user.name}
-        </Typography>
-        <Typography
-          color="textSecondary"
-          variant="body2"
-        >
-          {user.jobTitle}
-        </Typography>
+        <div className="badge-container">
+          <Typography
+            className={classes.name}
+            color="textPrimary"
+            variant="h5"
+          >
+            {profile.userName}
+          </Typography>
+          <img src={`../static/${profile.userBadge}.png`} alt="badge" className="badge" />
+        </div>
       </Box>
       <Divider />
       <Box p={2}>

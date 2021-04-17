@@ -56,9 +56,9 @@ const TopBar = ({
   ...rest
 }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const navigate = useNavigate();
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -75,7 +75,7 @@ const TopBar = ({
   };
 
   const viewMembership = () => {
-    console.log('delete');
+    navigate('/teacher/membership', { replace: true });
     handleMenuClose();
   };
 
@@ -90,7 +90,7 @@ const TopBar = ({
       {...rest}
     >
       <Toolbar>
-        <RouterLink to="/">
+        <RouterLink to="/teacher/home">
           <Logo />
         </RouterLink>
         <Box flexGrow={1} />

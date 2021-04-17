@@ -20,6 +20,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  CircularProgress,
   MenuItem
 } from '@material-ui/core';
 import Visibility from '@material-ui/icons/Visibility';
@@ -45,6 +46,7 @@ const RegisterView = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
   const [accountType, setAcctType] = React.useState('teacher');
+  const [isLoading, setIsLoading] = React.useState(false);
   const handChangeAccType = (value) => {
     console.log(value.target.value);
     setAcctType(value.target.value);
@@ -87,6 +89,7 @@ const RegisterView = () => {
             }
               onSubmit={async (values) => {
                 console.log(values);
+                setIsLoading(true);
                 signUp({
                   userEmail: values.email,
                   userName: values.userName,
@@ -97,12 +100,16 @@ const RegisterView = () => {
                   if (res.flag) {
                     cogoToast.success(res.msg, { position: 'bottom-right' });
                     setTimeout(() => {
+                      setIsLoading(false);
                       navigate('/signin', { replace: true });
                     }, 1500);
                   } else {
+                    setIsLoading(false);
                     cogoToast.warn(res.msg, { position: 'bottom-right' });
                   }
                   console.log(res, 'in front - end');
+                }).catch((res) => {
+                  setIsLoading(false);
                 });
               }}
             >
@@ -231,6 +238,7 @@ const RegisterView = () => {
                       variant="contained"
                     >
                       Sign up now
+                      {isLoading && <CircularProgress color="nice" size={20} className="progress" />}
                     </Button>
                   </Box>
                   <Typography

@@ -268,3 +268,43 @@ export async function getUsers(data) {
   });
   return DATA;
 }
+
+export async function getMessageApi(data) {
+  const DATA = await Axios.post('getmessage', data).then((res) => {
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    return res.data.data;
+  });
+  return DATA;
+}
+
+export async function readMsgApi(data) {
+  const DATA = await Axios.post('readmesage', data).then((res) => {
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    return res.data.data;
+  });
+  return DATA;
+}
+
+export async function membershipUpgradeApi(data) {
+  const DATA = await Axios.post('membershipUpgrade', data).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  });
+  return DATA;
+}
+
+export async function joinMemApi(data) {
+  const DATA = await Axios.post('joinmem', data).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  });
+  return DATA;
+}

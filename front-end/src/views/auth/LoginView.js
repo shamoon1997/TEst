@@ -9,6 +9,7 @@ import {
   Link,
   TextField,
   Typography,
+  CircularProgress,
   makeStyles,
   Card
 } from '@material-ui/core';
@@ -30,6 +31,15 @@ const LoginView = () => {
   const { store, setStore } = React.useContext(StoreContext);
   const classes = useStyles();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const userBadgeCal = (score) => {
+    if (score < 30) {
+      return 'bronze';
+    } if (score < 60) {
+      return 'silver';
+    }
+    return 'gold';
+  };
 
   return (
     <Page
@@ -54,6 +64,7 @@ const LoginView = () => {
                 password: Yup.string().max(255).required('Password is required')
               })}
               onSubmit={async (values) => {
+                setIsLoading(true);
                 signIn({
                   userEmail: values.email,
                   userPwd: values.password
@@ -80,8 +91,12 @@ const LoginView = () => {
                         user_birth: res.data.u_birthday,
                         userType: res.data.u_type,
                         userSchool: res.data.u_school,
-                        userPhone: res.data.u_phonenumber
+                        userPhone: res.data.u_phonenumber,
+                        userMembership: res.data.u_membership_type,
+                        userMemberdate: res.data.u_expire_date,
+                        userBadge: userBadgeCal(res.data.u_score)
                       };
+                      setIsLoading(false);
                       localStorage.setItem('brainaly_user', JSON.stringify(userData));
                       if (res.data.u_type === 'teacher') {
                         navigate('/teacher/home', { replace: true });
@@ -93,8 +108,11 @@ const LoginView = () => {
                       }
                     }, 1500);
                   } else {
+                    setIsLoading(false);
                     cogoToast.warn(res.msg, { position: 'bottom-right' });
                   }
+                }).catch(() => {
+                  setIsLoading(false);
                 });
               }}
             >
@@ -205,6 +223,7 @@ const LoginView = () => {
                       variant="contained"
                     >
                       Sign in now
+                      {isLoading && <CircularProgress color="nice" size={20} className="progress" />}
                     </Button>
                   </Box>
                   <Typography

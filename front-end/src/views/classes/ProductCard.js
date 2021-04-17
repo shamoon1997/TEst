@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -19,7 +20,9 @@ import {
   DialogTitle,
   DialogContentText
 } from '@material-ui/core';
+import { v4 as uuid } from 'uuid';
 import { useNavigate } from 'react-router-dom';
+// import EditIcon from '@material-ui/icons/Edit';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -27,6 +30,7 @@ import RemoveRedEyeIcon from '@material-ui/icons/RemoveRedEye';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Zoom from 'react-reveal/Zoom';
 import { deleteClass } from 'src/utils/Api';
+import humanFriendlyDate from 'src/utils/Timeformat';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,8 +67,10 @@ const ProductCard = ({
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteId, setDeleteId] = useState('');
   const open = Boolean(anchorEl);
+  const user = JSON.parse(localStorage.getItem('brainaly_user'));
   const navigate = useNavigate();
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -76,7 +82,12 @@ const ProductCard = ({
   const editQu = (id) => {
     console.log(id);
     // window.open(`/teacher/new?id=${id}`, '_blank');
-    navigate(`/class/edit?id=${id}`, { replace: true });
+    if (user.userType === 'student') {
+      navigate(`/student/edit?id=${id}`, { replace: true });
+    } else {
+      navigate(`/class/edit?id=${id}`, { replace: true });
+    }
+
     handleMenuClose();
   };
   const deleteQu = (id) => {
@@ -95,6 +106,12 @@ const ProductCard = ({
       handleClose();
       refresh(1);
     });
+  }
+  function handleCancel() {
+    setConfirmOpen(false);
+  }
+  function handleJoin() {
+    setConfirmOpen(false);
   }
   return (
     <div>
@@ -117,6 +134,28 @@ const ProductCard = ({
           </Button>
           <Button onClick={handleDelete} color="secondary" variant="contained" autoFocus>
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={confirmOpen}
+        onClose={handleCancel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        key={uuid()}
+      >
+        <DialogTitle id="alert-dialog-title">Are you sure to join this class?</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            You can share all info of your test results with your classmates.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel} color="primary" variant="contained">
+            Cancel
+          </Button>
+          <Button onClick={handleJoin} color="secondary" variant="contained" autoFocus>
+            Join
           </Button>
         </DialogActions>
       </Dialog>
@@ -195,6 +234,7 @@ const ProductCard = ({
                   <MoreVertIcon
                     onClick={handleMenuClick}
                   />
+
                   <Menu
                     id="long-menu"
                     anchorEl={anchorEl}
@@ -202,20 +242,37 @@ const ProductCard = ({
                     open={open}
                     onClose={handleMenuClose}
                   >
-                    <MenuItem
-                      key={product.id}
-                      className={classes.menuItem}
-                      onClick={() => { editQu(product.id); }}
-                    >
-                      <RemoveRedEyeIcon className={classes.menuIcon} />
-                      {' '}
-                      View
-                    </MenuItem>
-                    <MenuItem key={`${product.id}1`} className={classes.menuItem} onClick={() => { deleteQu(product.id); }}>
-                      <DeleteIcon className={classes.menuIcon} />
-                      Delete
-                    </MenuItem>
+                    {
+                    user.userType === 'student' ? (
+                      <MenuItem
+                        key={`${product.id}1`}
+                        className={classes.menuItem}
+                        onClick={() => { editQu(product.id); }}
+                      >
+                        <RemoveRedEyeIcon className={classes.menuIcon} />
+                        View
+                      </MenuItem>
+                    )
+                      : ([
+                        <MenuItem
+                          key={product.id}
+                          className={classes.menuItem}
+                          onClick={() => { editQu(product.id); }}
+                        >
+                          <RemoveRedEyeIcon className={classes.menuIcon} />
+                          {' '}
+                          View
+                        </MenuItem>,
+                        <MenuItem key={`${product.id}1`} className={classes.menuItem} onClick={() => { deleteQu(product.id); }}>
+                          <DeleteIcon className={classes.menuIcon} />
+                          Delete
+                        </MenuItem>
+                      ]
+
+                      )
+                        }
                   </Menu>
+
                 </Grid>
               </Grid>
             </Grid>
@@ -243,7 +300,7 @@ const ProductCard = ({
                 >
                   Create at
                   {' '}
-                  {product.created}
+                  {humanFriendlyDate(product.created)}
                 </Typography>
                 <PlayArrowIcon
                   className={classes.statsIcon}

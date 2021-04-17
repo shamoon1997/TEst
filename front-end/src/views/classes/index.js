@@ -1,3 +1,4 @@
+/* eslint-disable object-shorthand */
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -34,7 +35,11 @@ const ClassView = () => {
   useEffect(() => {
     async function getList() {
       const user = JSON.parse(localStorage.getItem('brainaly_user'));
-      await getClassList({ userid: user.userId, pageNum: 1 }).then((res) => {
+      await getClassList({
+        userid: user.userId,
+        pageNum: 1,
+        userType: user.userType
+      }).then((res) => {
         console.log(res);
         const productsArray = [];
         setPageNum(1);
@@ -58,10 +63,40 @@ const ClassView = () => {
     }
     getList();
   }, []);
-
+  const refreshPage = async () => {
+    const user = JSON.parse(localStorage.getItem('brainaly_user'));
+    await getClassList({
+      userid: user.userId,
+      pageNum: pageNum,
+      userType: user.userType
+    }).then((res) => {
+      console.log(res);
+      const productsArray = [];
+      setTotalNum(Math.ceil(res.total / global.pageNationLimit));
+      for (let i = 0; i < res.result.length; i++) {
+        const createDate = new Date(res.result[i].cl_createdAt);
+        const students = JSON.parse(res.result[i].cl_students);
+        const newData = {
+          title: res.result[i].cl_name,
+          media: res.result[i].cl_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].cl_cover}`,
+          description: res.result[i].cl_description,
+          id: res.result[i].cl_uid,
+          studentNum: students.length,
+          created: `${createDate.getFullYear()}-${createDate.getMonth() + 1}-${createDate.getDate()}`
+        };
+        productsArray.push(newData);
+        console.log(res.result[i]);
+      }
+      setProducts(productsArray);
+    });
+  };
   const getClassPage = async (pageN) => {
     const user = JSON.parse(localStorage.getItem('brainaly_user'));
-    await getClassList({ userid: user.userId, pageNum: pageN }).then((res) => {
+    await getClassList({
+      userid: user.userId,
+      pageNum: pageN,
+      userType: user.userType
+    }).then((res) => {
       console.log(res);
       const productsArray = [];
       setPageNum(pageN);
@@ -89,7 +124,7 @@ const ClassView = () => {
       title="Questions"
     >
       <Container maxWidth={false}>
-        <Toolbar />
+        <Toolbar refresh={refreshPage} />
         <Box mt={3}>
           <Grid
             container

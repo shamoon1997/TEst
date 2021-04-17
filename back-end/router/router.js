@@ -2,13 +2,29 @@ const express = require("express");
 var multer = require('multer');
 const router = express.Router();
 const bcrypt = require("bcryptjs")
+const moment = require("moment");
 // mysql connection
 
+const stripe = require("stripe")("sk_test_51IPvrnIAaIJ9dA25lOk4dDB0RRLvkDYb1LF9pITxtcl67oiVpoHA3tycYgnUn01SDHmg8VAIzhOUaDfxV7JpMN4X00Odeh68UU");
 const mysql = require('mysql');
 const host = 'localhost';
 const user = 'root';
 const password = '';
 const database = 'brainaly';
+
+function runQuery(query1){
+  return new Promise(resolve => {
+         
+    setTimeout(() => {
+      var resultData = '';
+        con.query(query1, (err, result) => {
+          if(err) throw err;
+          resultData = result
+          resolve(resultData);
+        });
+    }, 100);
+  });
+}
 
 const con = mysql.createConnection({
   host,
@@ -406,8 +422,18 @@ router.post("/getclasslist", async (req, res) => {
   if(pageNum < 0 ){
     pageNum = 0
   }
-  const query = "SELECT * FROM `classes` WHERE cl_user_id = '"+req.body.userid+"' LIMIT "+limitNum+" OFFSET "+limitNum * pageNum;
-  await con.query("SELECT * FROM `classes` WHERE cl_user_id = '"+req.body.userid+"'", (err, result, fields) => {
+  var query = "";
+  var queryTotal = "";
+  console.log(req.body.userType);
+  if(req.body.userType == 'student'){
+    query = "SELECT * FROM `classes` LIMIT "+limitNum+" OFFSET "+limitNum * pageNum;
+    queryTotal = "SELECT * FROM `classes`";
+  } else {
+    query = "SELECT * FROM `classes` WHERE cl_user_id = '"+req.body.userid+"' LIMIT "+limitNum+" OFFSET "+limitNum * pageNum;
+    queryTotal = "SELECT * FROM `classes` WHERE cl_user_id = '"+req.body.userid+"'";
+  }
+  
+  await con.query(queryTotal, (err, result, fields) => {
     if (err) throw err;
     console.log(result.length)
     totalNum = result.length
@@ -422,6 +448,52 @@ router.post("/getclasslist", async (req, res) => {
     })
   })
 });
+
+router.post("/joinmem", async (req, res) => {
+  // cls_id: classId,
+  //     join_flag: joinFlag,
+  //     pageNum: cPageNum
+  var query = "SELECT * FROM `classes` WHERE `cl_uid`='"+req.body.cls_id+"'";
+  var result = await runQuery(query);
+  var students = JSON.parse(result[0].cl_students);
+  if(students.indexOf(req.body.u_id) >= 0){
+    // remove student from class
+    students.pop(students.indexOf(req.body.u_id));
+  } else {
+    students.push(req.body.u_id);
+  }
+
+  query = "UPDATE `classes` SET `cl_students`='"+JSON.stringify(students)+"' WHERE `cl_uid` = '"+req.body.cls_id+"'";
+  await runQuery(query);
+
+  var totalNum = 0;
+  var pageNum = req.body.pageNum - 1; 
+  if(pageNum < 0 ){
+    pageNum = 0
+  }
+
+  var query = "";
+  var queryTotal = "";
+  
+  query = "SELECT * FROM `classes` LIMIT "+limitNum+" OFFSET "+limitNum * pageNum;
+  queryTotal = "SELECT * FROM `classes`";
+  
+  await con.query(queryTotal, (err, result, fields) => {
+    if (err) throw err;
+    console.log(result.length)
+    totalNum = result.length
+  });
+
+  await con.query(query, (err, result, fields) => {
+    if(err) throw err;
+    console.log(result)
+    res.json({
+      result,
+      total: totalNum
+    })
+  })
+});
+
 router.post("/getclassbyid", async (req, res) => {
   console.log(req.body)
   const query = "SELECT * FROM `classes` WHERE cl_uid = '"+req.body.id+"'";
@@ -476,10 +548,48 @@ router.post("/updateprofile", async (req, res) => {
   });
 });
 
+
+// chats
 router.post("/getusers", async (req, res) => {
-  console.log(req.body);
-  // const query = "SELECT * FROM `users` WHERE u_id != '"+req.body.userId+"'";
-  const query = "SELECT * FROM `users`";
+  const query = "SELECT * FROM users WHERE u_id != '"+req.body.userId+"';";
+  var users = '';
+  var resultData = [];
+
+  await con.query(query, async (err, result) => {
+    if(err) throw err;
+
+    users = result;
+    
+    for(var i = 0; i < users.length; i++){
+      const query1 = "SELECT * FROM chats WHERE m_from_id = "+users[i].u_id+" AND m_to_id = "+req.body.userId+" AND m_read_at = ''";
+      await callBackFnc(query1, i);
+    }
+
+    function callBackFnc(query1, i){
+      return new Promise(resolve => {
+        setTimeout(() => {
+          con.query(query1, (err, result) => {
+            if(err) throw err;
+            resultData.push({
+              ...users[i],
+              newMsgNum: result.length
+            })
+          });
+          resolve(resultData);
+        }, 100);
+      });
+    }
+    setTimeout(()=>{
+      res.json({
+        data: resultData,
+        message: 'success'
+      })
+    }, 350);
+  });
+});
+
+router.post("/getmessage", async (req, res) => {
+  const query = "SELECT * FROM chats WHERE (m_from_id = "+req.body.userId+" AND m_to_id = "+req.body.client_id+") OR (m_to_id = "+req.body.userId+" AND m_from_id = "+req.body.client_id+")";
   console.log(query);
   await con.query(query, (err, result) => {
     if(err) throw err;
@@ -488,6 +598,79 @@ router.post("/getusers", async (req, res) => {
       message: 'success'
     })
   });
+});
+
+router.post("/readmesage", async (req, res) => {
+  const query = "UPDATE `chats` SET `m_read_at`= '"+moment().format()+"' WHERE `m_from_id` = '"+req.body.from_id+"' AND "+ "`m_to_id` = "+req.body.to_id ;
+  console.log(query);
+  await con.query(query, (err, result) => {
+    if(err) throw err;
+    res.json({
+      data: req.body.from_id,
+      message: 'success'
+    })
+  });
+});
+
+const calculateOrderAmount = (payType, userType) => {
+  if(payType == 'standard'){
+    if(userType = 'teacher') {
+      return 1000;
+    } else {
+      return 500;
+    }
+  } else {
+    if(userType = 'teacher') {
+      return 1500;
+    } else {
+      return 1000;
+    }
+  }
+};
+
+router.post("/membershipUpgrade", async (req, res) => {
+
+  var amount = calculateOrderAmount(req.body.payType, req.body.userType);
+  function callBackFnc(query1){
+    return new Promise(resolve => {
+           
+      setTimeout(() => {
+        var resultData = '';
+          con.query(query1, (err, result) => {
+            if(err) throw err;
+            resultData = result
+            resolve(resultData);
+          });
+      }, 100);
+    });
+  }
+
+  stripe.customers.create({
+    email: req.body.userEmail,
+   source: req.body.token.id,
+ })
+ .then(customer =>
+   stripe.charges.create({
+     amount,
+     description: req.body.payType+" membership upgrade from "+ req.body.userName,
+        currency: "usd",
+        customer: customer.id
+   }))
+ .then(async charge => {
+  var eNow = new Date();
+  eNow.setMonth(eNow.getMonth()+1);
+  var eMoment = moment(eNow);
+  var query1 = "UPDATE `users` SET `u_membership_type`='"+req.body.payType+"', `u_expire_date`='"+eMoment.format()+"'   WHERE `u_id` = '"+req.body.userId+"'";
+
+  await callBackFnc(query1);
+  var query = "SELECT * FROM `users` WHERE `u_id` = '"+req.body.userId+"'";
+  var userResult = await callBackFnc(query);
+  console.log(userResult);
+  res.json({ err: null, msg: 'Your Membership is Upgraded', userInfo: userResult[0] })
+ }).catch((err)=>{
+   console.log(err)
+  res.json({ err: err, msg: "There was a error, Please check your CardInfo Or contact Admin!"});
+ });
 });
 
 module.exports = router;

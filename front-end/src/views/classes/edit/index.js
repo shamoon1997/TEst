@@ -1,3 +1,5 @@
+/* eslint-disable no-loop-func */
+/* eslint-disable max-len */
 /* eslint-disable no-shadow */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
@@ -9,6 +11,7 @@ import {
   Card,
   CardContent,
   Typography,
+  Avatar,
   Divider,
   Button
 } from '@material-ui/core';
@@ -21,12 +24,6 @@ import EditDialog from './dialog';
 import AddDialog from './AddPop';
 
 const columns = [
-  {
-    field: 'media',
-    headerName: 'Photo',
-    sortable: false,
-    width: 80,
-  },
   { field: 'id', headerName: 'ID', width: 70 },
   { field: 'name', headerName: 'Name', width: 130 },
   // { field: 'lastName', headerName: 'Last name', width: 130 },
@@ -34,6 +31,24 @@ const columns = [
     field: 'birthday',
     headerName: 'Birthday',
     type: 'date',
+    width: 150,
+  },
+  {
+    field: 'school',
+    headerName: 'School',
+    type: 'string',
+    width: 150,
+  },
+  {
+    field: 'level',
+    headerName: 'Level',
+    type: 'string',
+    width: 150,
+  },
+  {
+    field: 'score',
+    headerName: 'Score',
+    type: 'string',
     width: 150,
   }
 ];
@@ -99,7 +114,15 @@ export default function EditCollection() {
   const { collection, setCollection } = React.useContext(CollectionContext);
   const [addOpen, setAddOpen] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState('');
-
+  const user = JSON.parse(localStorage.getItem('brainaly_user'));
+  const userBadgeCal = (score) => {
+    if (score < 30) {
+      return 'bronze';
+    } if (score < 60) {
+      return 'silver';
+    }
+    return 'gold';
+  };
   useEffect(() => {
     async function fetchData() {
       const user = JSON.parse(localStorage.getItem('brainaly_user'));
@@ -108,15 +131,24 @@ export default function EditCollection() {
         setSelectedQuiz(res[0].cl_students);
         const quizArray = [];
         for (let i = 0; i < quizList.length; i++) {
-          const data = { id: quizList[i].id, userid: user.userId };
+          const data = { id: quizList[i], userid: user.userId };
           console.log(data);
           await getStudentById(data).then((res) => {
+            console.log(res);
             const born = new Date(res[0].u_birthday);
             quizArray.push({
-              media: res[0].u_avatar,
+              // media: <Avatar
+              //   alt="Product"
+              //   src={res[0].u_avatar === null ? '../static/collection.png' : `${global.serverUrl}upload/${res[0].u_avatar}`}
+              //   variant="square"
+              //   className="grid-avatar"
+              // />,
               id: res[0].u_id,
               name: res[0].u_name,
-              birthday: res[0].u_birthday === null ? 'Undefined' : `${born.getFullYear()}-${born.getMonth() + 1}-${born.getDate()}`,
+              birthday: res[0].u_birthday === null ? '' : `${born.getFullYear()}-${born.getMonth() + 1}-${born.getDate()}`,
+              school: res[0].u_school,
+              level: userBadgeCal(res[0].u_score),
+              score: res[0].u_score
             });
           });
         }
@@ -163,9 +195,14 @@ export default function EditCollection() {
               <Typography variant="body1">
                 {collection.description}
               </Typography>
-              <div className={classes.editButton}>
-                <Button variant="contained" color="primary" onClick={() => { handleEdit(); }} style={{ fontSize: 16 }}>Edit</Button>
-              </div>
+              {
+                user.userType === 'student' ? null : (
+                  <div className={classes.editButton}>
+                    <Button variant="contained" color="primary" onClick={() => { handleEdit(); }} style={{ fontSize: 16 }}>Edit</Button>
+                  </div>
+                )
+              }
+
             </CardContent>
           </Card>
         </Grid>
@@ -179,7 +216,7 @@ export default function EditCollection() {
               </div>
               <Divider className={classes.divider} />
               <div style={{ height: 'calc(100vh - 200px)', width: '100%' }}>
-                <DataGrid rows={product} columns={columns} pageSize={10} checkboxSelection />
+                <DataGrid rows={product} columns={columns} pageSize={15} checkboxSelection />
                 {/* <Grid container xs={12} spacing={2}>
                   {collection?.product?.map((product, index) => (
                   ))}

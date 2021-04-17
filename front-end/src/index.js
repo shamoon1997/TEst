@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-// import * as serviceWorker from './serviceWorker';
 import StoreContext from './context/index';
 import CollectionContext from './context/collection';
 import ProfileContext from './context/profile';

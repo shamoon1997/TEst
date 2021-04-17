@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Grid,
   makeStyles
 } from '@material-ui/core';
 import Page from 'src/components/Page';
+import authChecker from 'src/utils/authHelper';
 import Profile from './Profile';
 import ProfileDetails from './ProfileDetails';
 
@@ -19,7 +21,11 @@ const useStyles = makeStyles((theme) => ({
 
 const Account = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
 
+  React.useEffect(() => {
+    if (!authChecker('authCheck')) navigate('/', { replace: true });
+  }, []);
   return (
     <Page
       className={classes.root}

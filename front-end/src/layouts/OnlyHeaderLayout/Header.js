@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {
@@ -55,6 +55,7 @@ const TopBar = ({
   ...rest
 }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleMenuClick = (event) => {
@@ -71,7 +72,7 @@ const TopBar = ({
   };
 
   const viewMembership = () => {
-    console.log('delete');
+    navigate('/teacher/membership', { replace: true });
     handleMenuClose();
   };
   return (

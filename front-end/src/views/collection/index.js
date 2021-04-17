@@ -43,7 +43,8 @@ const ProductList = () => {
             title: res.result[i].col_name,
             media: res.result[i].col_image === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].col_image}`,
             description: res.result[i].col_description,
-            id: res.result[i].col_uid
+            id: res.result[i].col_uid,
+            created: res.result[i].col_created_at
           };
           productsArray.push(newData);
           console.log(res.result[i]);

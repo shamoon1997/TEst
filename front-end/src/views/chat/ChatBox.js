@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-undef */
 /* eslint-disable eqeqeq */
 /* eslint-disable array-callback-return */
@@ -17,7 +18,10 @@ import MyMsg from './MyMsg';
 const useStyles = makeStyles((theme) => ({
   root: {
     padding: 15,
-    minHeight: 700
+    minHeight: 700,
+    maxHeight: 750,
+    overflowY: 'scroll',
+    paddingBottom: 45
   },
   avatar: {
     marginRight: theme.spacing(2)
@@ -38,26 +42,32 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const ChatBox = ({ MsgContent }) => {
+const ChatBox = ({ MsgContent, selUser }) => {
   const classes = useStyles();
   const [profile, setProfile] = React.useState('');
+  const [message, setMessage] = React.useState([]);
   React.useEffect(() => {
     const currentUser = localStorage.getItem('brainaly_user');
     const userObject = JSON.parse(currentUser);
     setProfile(userObject);
   }, []);
 
+  React.useEffect(() => {
+    setMessage(MsgContent);
+  }, [MsgContent]);
+
   return (
     <Card
       className={clsx(classes.root, 'message-box')}
       key={uuid()}
+      id="chatbox"
     >
       {
-        MsgContent.map((msg) => {
+        message.length ? message.map((msg) => {
           return (
-            profile.userId == msg.from_id ? <MyMsg content={msg} /> : <CustomerMsg content={msg} />
+            profile.userId == msg.m_to_id ? <MyMsg content={msg} /> : <CustomerMsg content={msg} selectedUser={selUser} />
           );
-        })
+        }) : null
       }
     </Card>
   );
@@ -65,6 +75,7 @@ const ChatBox = ({ MsgContent }) => {
 
 ChatBox.propTypes = {
   MsgContent: PropTypes.object,
+  selUser: PropTypes.object
 };
 
 export default ChatBox;

@@ -85,7 +85,7 @@ const ProductCard = ({
             >
               <Avatar
                 alt="Product"
-                src={product.media === null ? '/static/collection.png' : `${global.serverUrl}upload/${product.media}`}
+                src={product.media === null ? '../static/collection.png' : `${global.serverUrl}upload/${product.media}`}
                 variant="square"
                 className={clsx(classes.quAvatar, className)}
               />

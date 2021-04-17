@@ -27,6 +27,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Zoom from 'react-reveal/Zoom';
 import { deleteQuiz } from 'src/utils/Api';
+import humanFriendlyDate from 'src/utils/Timeformat';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,6 +55,9 @@ const useStyles = makeStyles((theme) => ({
   },
   menuIcon: {
     marginRight: theme.spacing(1)
+  },
+  teach: {
+    marginLeft: 20
   }
 }));
 
@@ -241,7 +245,9 @@ const ProductCard = ({
                   display="inline"
                   variant="body2"
                 >
-                  Created at 2021-02-03
+                  Created at
+                  {' '}
+                  {humanFriendlyDate(product.created)}
                 </Typography>
                 <PlayArrowIcon
                   className={classes.statsIcon}
@@ -263,6 +269,9 @@ const ProductCard = ({
               >
                 <Button variant="contained" color="primary">
                   Play
+                </Button>
+                <Button variant="contained" color="secondary" className={classes.teach}>
+                  Teach
                 </Button>
               </Grid>
             </Grid>

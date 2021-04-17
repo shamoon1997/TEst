@@ -213,6 +213,18 @@ const ProfileDetails = ({ className, ...rest }) => {
                 />
               </MuiPickersUtilsProvider>
             </Grid>
+            {
+              profile.userMembership !== 'free' ? (
+                <Grid
+                  item
+                  md={6}
+                  xs={12}
+                >
+                  <img src={`../static/${profile.userMembership}-membership.png`} alt="standard" className="membershipMark" />
+                </Grid>
+              ) : null
+            }
+
           </Grid>
         </CardContent>
         <Divider />

@@ -27,6 +27,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Zoom from 'react-reveal/Zoom';
 import { deleteCol } from 'src/utils/Api';
+import humanFriendlyDate from 'src/utils/Timeformat';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -240,7 +241,9 @@ const ProductCard = ({
                   display="inline"
                   variant="body2"
                 >
-                  Created at 2021-02-03
+                  Created at
+                  {' '}
+                  {humanFriendlyDate(product.created)}
                 </Typography>
                 <PlayArrowIcon
                   className={classes.statsIcon}

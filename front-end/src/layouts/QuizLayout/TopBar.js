@@ -76,12 +76,12 @@ const TopBar = ({
 
   const viewProfile = () => {
     console.log('edit');
-    navigate('/app/account', { replace: true });
+    navigate('/teacher/account', { replace: true });
     handleMenuClose();
   };
 
   const viewMembership = () => {
-    console.log('delete');
+    navigate('/teacher/membership', { replace: true });
     handleMenuClose();
   };
 

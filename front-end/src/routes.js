@@ -18,11 +18,15 @@ import ClassView from 'src/views/classes';
 import EditCollection from 'src/views/collection/edit';
 import EditClass from 'src/views/classes/edit';
 import AuthProtect from 'src/components/AuthProtect';
-import StudentHome from 'src/views/student/home';
+import StudentHome from 'src/views/student/quiz';
+import Membership from 'src/views/membership';
+import MembershipStu from 'src/views/student/membership';
 import QuizLayout from './layouts/QuizLayout';
+import QuizLayoutStu from './layouts/QuizLayoutStu';
 import OnlyHeaderLayout from './layouts/OnlyHeaderLayout';
 import ClassLayout from './layouts/ClassLayout';
 import StudentLayout from './layouts/StudentLayout';
+
 // import StoreContext from 'src/context/index';
 
 // const { store } = React.useContext(StoreContext);
@@ -63,6 +67,7 @@ const routes = [
       { path: 'signup', element: <RegisterView /> },
       { path: 'collections', element: <Collections /> },
       { path: 'class', element: <ClassView /> },
+      { path: 'membership', element: <Membership /> },
       { path: 'signin', element: <LoginView /> },
       { path: '404', element: <NotFoundView /> },
       { path: '/', element: <HomeView /> },
@@ -113,11 +118,27 @@ const routes = [
     children: [
       { path: 'account', element: <AccountView /> },
       { path: 'home', element: <StudentHome /> },
+      { path: 'chat', element: <ChatView /> },
+      { path: 'class', element: <ClassView /> },
+      { path: 'membership', element: <MembershipStu /> },
+      { path: 'edit', element: <EditClass /> },
+      { path: 'signup', element: <RegisterView /> },
+      { path: 'signin', element: <LoginView /> },
+      { path: '404', element: <NotFoundView /> },
+      { path: '/', element: <StudentHome /> },
+      { path: '*', element: <Navigate to="/student/404" /> }
+    ]
+  },
+  {
+    path: 'student',
+    element: <QuizLayoutStu />,
+    children: [
+      { path: 'new', element: <NewQuiz /> },
       { path: 'signup', element: <RegisterView /> },
       { path: 'signin', element: <LoginView /> },
       { path: '404', element: <NotFoundView /> },
       { path: '/', element: <HomeView /> },
-      { path: '*', element: <Navigate to="/student/404" /> }
+      { path: '*', element: <Navigate to="/teacher/404" /> }
     ]
   },
 ];

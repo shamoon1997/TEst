@@ -18,13 +18,24 @@ import {
   DialogContent,
   DialogContentText,
   CircularProgress,
+  Divider,
   Typography,
   Grid
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
+import cogoToast from 'cogo-toast';
+import Zoom from 'react-reveal/Zoom';
 import { useNavigate } from 'react-router-dom';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import StoreContext from 'src/context/index';
-import { imageUpload, newClass } from 'src/utils/Api';
+import {
+  imageUpload,
+  newClass,
+  getClassList,
+  joinMemApi
+} from 'src/utils/Api';
+import humanFriendlyDate from 'src/utils/Timeformat';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -42,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 20,
     color: 'purple',
     marginLeft: 10,
-    minWidth: 250
+    width: 25
   },
   none: {
     display: 'none'
@@ -82,12 +93,19 @@ const useStyles = makeStyles((theme) => ({
     marginTop: -50,
     marginLeft: -90
   },
+  statsItem: {
+    display: 'flex',
+    alignItems: 'center'
+  },
   fileModal: {
     display: 'none'
   },
+  joinModal: {
+    width: '50vw'
+  }
 }));
 
-const Toolbar = ({ className, ...rest }) => {
+const Toolbar = ({ refresh, className, ...rest }) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const { store, setStore } = React.useContext(StoreContext);
@@ -99,6 +117,11 @@ const Toolbar = ({ className, ...rest }) => {
   const [description, setDescription] = useState('');
   const [imageSource, setImageSource] = useState('');
   const [coverImageName, setCoverImageName] = useState('');
+  const [classRooms, setClasses] = useState([]);
+  const [totalNum, setTotalNum] = useState(0);
+  const [cPageNum, setCPageNum] = useState(1);
+  const [joinModal, setJoinModal] = useState(false);
+  const userS = JSON.parse(localStorage.getItem('brainaly_user'));
   const handleClose = () => {
     setOpen(false);
     setIsLoading(false);
@@ -139,6 +162,84 @@ const Toolbar = ({ className, ...rest }) => {
   };
   async function goAddNewQuiz() {
     setOpen(true);
+  }
+  async function loadMore() {
+    console.log('loadmore');
+  }
+  async function joinMem(classId, joinFlag) {
+    console.log(classId, joinFlag);
+    setIsLoading(true);
+    joinMemApi({
+      cls_id: classId,
+      join_flag: joinFlag,
+      u_id: userS.userId,
+      pageNum: cPageNum
+    }).then((res) => {
+      const productsArray = [];
+      setIsLoading(false);
+      console.log(res);
+      setTotalNum(Math.ceil(res.total / global.pageNationLimit));
+      for (let i = 0; i < res.result.length; i++) {
+        const createDate = new Date(res.result[i].cl_createdAt);
+        const students = JSON.parse(res.result[i].cl_students);
+        const newData = {
+          title: res.result[i].cl_name,
+          media: res.result[i].cl_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].cl_cover}`,
+          description: res.result[i].cl_description,
+          id: res.result[i].cl_uid,
+          studentNum: students.length,
+          memStudents: students,
+          created: `${createDate.getFullYear()}-${createDate.getMonth() + 1}-${createDate.getDate()}`
+        };
+        productsArray.push(newData);
+        console.log(res.result[i]);
+      }
+      setClasses(productsArray);
+      refresh();
+    }).catch(() => {
+      cogoToast.warn('There was an error, Please try again', { position: 'bottom-right' });
+    });
+  }
+  async function joinClass() {
+    setIsLoading(true);
+    await getClassList({
+      userid: userS.userId,
+      pageNum: 1,
+      userType: userS.userType
+    }).then((res) => {
+      const productsArray = [];
+      setIsLoading(false);
+      setTotalNum(Math.ceil(res.total / global.pageNationLimit));
+      for (let i = 0; i < res.result.length; i++) {
+        const createDate = new Date(res.result[i].cl_createdAt);
+        const students = JSON.parse(res.result[i].cl_students);
+        const newData = {
+          title: res.result[i].cl_name,
+          media: res.result[i].cl_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].cl_cover}`,
+          description: res.result[i].cl_description,
+          id: res.result[i].cl_uid,
+          studentNum: students.length,
+          memStudents: students,
+          created: `${createDate.getFullYear()}-${createDate.getMonth() + 1}-${createDate.getDate()}`
+        };
+        productsArray.push(newData);
+        console.log(res.result[i]);
+      }
+      setClasses(productsArray);
+    }).catch((err) => {
+      setIsLoading(false);
+      console.log(err);
+      cogoToast.warn('There was an error, Please try again', { position: 'bottom-right' });
+    });
+    setJoinModal(true);
+  }
+  function memCheck(members) {
+    console.log(members);
+    // return false;
+    if (members.indexOf(userS.userId) >= 0) {
+      return true;
+    }
+    return false;
   }
   async function handleImageChange(e) {
     if (e.target.files[0]) {
@@ -231,23 +332,179 @@ const Toolbar = ({ className, ...rest }) => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Dialog
+        open={joinModal}
+        onClose={() => { setJoinModal(false); }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        disableBackdropClick
+        disableEscapeKeyDown
+      >
+        <DialogTitle id="alert-dialog-title">Please select the class you hope to join</DialogTitle>
+        <DialogContent className={classes.joinModal}>
+          <Grid container xs={12}>
+            <Grid item xs={12} sm={12} style={{ marginTop: 20 }}>
+              {
+                  classRooms.map((cls) => {
+                    return (
+                      <Zoom>
+                        <Card
+                          className={clsx(classes.root, className)}
+                        >
+                          <CardContent>
+                            <Grid
+                              container
+                              flexDirection="row"
+                              spacing={2}
+                            >
+                              <Grid
+                                item
+                                xl={2}
+                                lg={2}
+                                md={2}
+                                xs={12}
+                              >
+                                <img
+                                  alt="Product"
+                                  src={cls.media}
+                                  style={{ width: '100%' }}
+                                />
+                              </Grid>
+                              <Grid
+                                item
+                                xl={10}
+                                lg={10}
+                                md={10}
+                                xs={12}
+                                container
+                                justifyContent="space-between"
+                                flexDirection="row"
+                              >
+                                <Grid
+                                  item
+                                  xl={12}
+                                  lg={12}
+                                  md={12}
+                                  xs={12}
+                                >
+                                  <Typography
+                                    align="left"
+                                    color="textPrimary"
+                                    gutterBottom
+                                    variant="h4"
+                                  >
+                                    {cls.title}
+                                  </Typography>
+                                  <Typography
+                                    align="left"
+                                    color="textPrimary"
+                                    variant="body1"
+                                  >
+                                    {cls.description}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            </Grid>
+                          </CardContent>
+                          <Box flexGrow={1} />
+                          <Divider />
+                          <Box p={2}>
+                            <Grid
+                              container
+                              justify="space-between"
+                              spacing={2}
+                            >
+                              <Grid
+                                className={classes.statsItem}
+                                item
+                                xl={12}
+                                lg={12}
+                                md={12}
+                                xs={12}
+                              >
+                                <AccessTimeIcon
+                                  className={classes.statsIcon}
+                                  color="action"
+                                />
+                                <Typography
+                                  color="textSecondary"
+                                  display="inline"
+                                  variant="body2"
+                                >
+                                  Create at
+                                  {' '}
+                                  {humanFriendlyDate(cls.created)}
+                                </Typography>
+                                <PlayArrowIcon
+                                  className={classes.statsIcon}
+                                  color="action"
+                                />
+                                <Typography
+                                  color="textSecondary"
+                                  display="inline"
+                                  variant="body2"
+                                >
+                                  Student Number
+                                  {' '}
+                                  {cls.studentNum}
+                                </Typography>
+                                {
+                                  memCheck(cls.memStudents) ? (
+                                    <Button variant="contained" onClick={() => { joinMem(cls.id, false); }} disabled={isLoading} color="secondary" style={{ marginLeft: 'auto' }} autoFocus>
+                                      Joined
+                                      {' '}
+                                      {isLoading && <CircularProgress color="nice" size={20} className={classes.progressBar} />}
+                                    </Button>
+                                  ) : (
+                                    <Button variant="contained" onClick={() => { joinMem(cls.id, true); }} disabled={isLoading} color="primary" style={{ marginLeft: 'auto' }} autoFocus>
+                                      Join
+                                      {' '}
+                                      {isLoading && <CircularProgress color="nice" size={20} className="pregress" />}
+                                    </Button>
+                                  )
+                                }
+
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        </Card>
+                      </Zoom>
+                    );
+                  })
+                }
+
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={() => { setJoinModal(false); }} color="secondary" autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Box
         display="flex"
         justifyContent="flex-end"
       >
-        {/* <Button className={classes.importButton}>
-          Import
-        </Button>
-        <Button className={classes.exportButton}>
-          Export
-        </Button> */}
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={goAddNewQuiz}
-        >
-          Create Class
-        </Button>
+        {
+          userS.userType === 'student' ? (
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={joinClass}
+            >
+              Join Class
+            </Button>
+          ) : (
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={goAddNewQuiz}
+            >
+              Create Class
+            </Button>
+          )
+        }
       </Box>
       <Box mt={3}>
         <Card>
@@ -279,7 +536,8 @@ const Toolbar = ({ className, ...rest }) => {
 };
 
 Toolbar.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+  refresh: PropTypes.func
 };
 
 export default Toolbar;

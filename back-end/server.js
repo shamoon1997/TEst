@@ -35,9 +35,33 @@ const io = require("socket.io")(server, {
   }
 }); // socket setup
 
+const {
+  connectRoom,
+  getDataFromSocket,
+  getUserStatus,
+  newMessage
+} = require("./socket/socket");
+
 io.on("connection", function(socket) {
-  console.log(socket)
-  socket.on('GetData', (data)=>{
-    console.log(data)
+  socket.on('connectRoom', (data)=>{
+    var users = connectRoom(data, socket);
+    socket.broadcast.emit("newUser", data);
   })
+
+  socket.on('getUserStatus', (users)=>{
+    var statusResult = getUserStatus(users);
+    socket.emit("updateUsersStatus", statusResult);
+  })
+
+  socket.on('sendMessage',async (msg) => {
+    console.log(msg);
+    newMessage(msg, socket);
+  })
+
+  socket.on('disconnect', ()=>{
+    var user = getDataFromSocket(socket);
+    socket.broadcast.emit("outUser", user);
+  })
+
+  
 });

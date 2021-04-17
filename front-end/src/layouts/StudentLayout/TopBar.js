@@ -74,7 +74,7 @@ const TopBar = ({
   };
 
   const viewMembership = () => {
-    console.log('delete');
+    navigate('/student/membership', { replace: true });
     handleMenuClose();
   };
 
@@ -89,7 +89,7 @@ const TopBar = ({
       {...rest}
     >
       <Toolbar>
-        <RouterLink to="/">
+        <RouterLink to="/student/home">
           <Logo />
         </RouterLink>
         <Box flexGrow={1} />
