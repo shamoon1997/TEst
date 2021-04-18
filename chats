@@ -94,73 +94,7 @@ insert  into `chats`(`id`,`m_from_id`,`m_to_id`,`m_content`,`m_read_at`,`m_creat
 (261,9,1,'Thank you',NULL,'2021-04-14 11:28:27'),
 (262,9,1,'How are you?',NULL,'2021-04-14 11:28:30');
 
-/*Table structure for table `classes` */
-
-DROP TABLE IF EXISTS `classes`;
-
-CREATE TABLE `classes` (
-  `cl_id` int(11) NOT NULL AUTO_INCREMENT,
-  `cl_uid` varchar(50) DEFAULT NULL,
-  `cl_cover` varchar(255) DEFAULT NULL,
-  `cl_name` varchar(255) DEFAULT NULL,
-  `cl_description` text DEFAULT NULL,
-  `cl_students` text DEFAULT NULL,
-  `cl_user_id` int(11) DEFAULT NULL,
-  `cl_createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`cl_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
-
-/*Data for the table `classes` */
-
-insert  into `classes`(`cl_id`,`cl_uid`,`cl_cover`,`cl_name`,`cl_description`,`cl_students`,`cl_user_id`,`cl_createdAt`) values 
-(7,'7aca4745-0923-1622-e781-7261f4721205','','123123123123123','123123123123123123123123','[9,10]',5,'2021-04-17 04:14:50');
-
-/*Table structure for table `collections` */
-
-DROP TABLE IF EXISTS `collections`;
-
-CREATE TABLE `collections` (
-  `col_id` int(11) NOT NULL AUTO_INCREMENT,
-  `col_name` varchar(255) DEFAULT NULL,
-  `col_description` text DEFAULT NULL,
-  `col_image` varchar(255) DEFAULT NULL,
-  `col_quiz` text DEFAULT NULL,
-  `col_uid` varchar(255) DEFAULT NULL,
-  `col_user_id` int(11) DEFAULT NULL,
-  `col_created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`col_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
-
-/*Data for the table `collections` */
-
-insert  into `collections`(`col_id`,`col_name`,`col_description`,`col_image`,`col_quiz`,`col_uid`,`col_user_id`,`col_created_at`) values 
-(1,'test col','text collections','1618243195071-avatar.jpg','[{\"id\":\"b3aa93fc-9026-d507-3e9c-8b6396fd09c2\"}]','b3997e29-55be-5956-531e-c0e61dd4b3ea',NULL,'2021-04-14 12:20:54'),
-(4,'34534','53453453453445345345345345345345','','[{\"id\":\"3ab461fd-20ff-585a-4303-270ac7121d3d\"},{\"id\":\"db94c37e-27b3-104b-261d-958b0a1c0a94\"}]','b12354fa-36f1-4165-d319-24d3f476eb95',1,'2021-04-14 12:20:54'),
-(5,'qweqw','qweqweqweqweqwe',NULL,NULL,NULL,NULL,'2021-04-14 12:20:54'),
-(6,'qweq','weqweqweqweqweqeqweqwe','','[]','2b117799-c6c6-fb4d-c84b-251ca72bca32',1,'2021-04-14 12:20:54'),
-(8,'123','123123123123123123123','','[]','54e6156d-014a-da39-b7ce-af0733c313a6',5,'2021-04-15 21:50:33');
-
-/*Table structure for table `questions` */
-
-DROP TABLE IF EXISTS `questions`;
-
-CREATE TABLE `questions` (
-  `q_id` int(11) NOT NULL AUTO_INCREMENT,
-  `q_name` varchar(30) DEFAULT NULL,
-  `q_description` varchar(200) DEFAULT NULL,
-  `q_cover` varchar(255) DEFAULT NULL,
-  `q_share` tinyint(1) DEFAULT 0,
-  `q_music_id` int(11) DEFAULT NULL,
-  `q_play_num` int(11) DEFAULT NULL,
-  `q_user_id` int(11) DEFAULT NULL,
-  `q_updated_at` date DEFAULT NULL,
-  `q_uid` varchar(100) DEFAULT NULL,
-  `q_content` text DEFAULT NULL,
-  `q_created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`q_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4;
-
-/*Data for the table `questions` */
-
-insert  into `questions`(`q_id`,`q_name`,`q_description`,`q_cover`,`q_share`,`q_music_id`,`q_play_num`,`q_user_id`,`q_updated_at`,`q_uid`,`q_content`,`q_created_at`) values 
-(18,'234','234234234234234234','',0,NULL,NULL,4,NULL,'faaac241-718c-11f2-1d8f-b9eac77d3c6f','[{\"href\":\"\",\"title\":\"\",\"quizType\":1,\"image\":\"\",\"quizAnswer\":[{\"sel\":0,\"answer\":\"\"},{\"sel\":0,\"answer\":\"\"},{\"sel\":0,\"answer\":\"\"},{\"sel\":0,\"answer\":\"\"}],\"quizTime\":20,\"point\":2}]','2021-04-14 12:22:45')
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

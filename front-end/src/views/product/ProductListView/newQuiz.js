@@ -149,7 +149,7 @@ export default function NewQuiz() {
     }
     if (store?.selectedItem?.quizType === 1) {
       setAnswerGraphic(
-        <Grid container xs={12} className={classes.answerContainer}>
+        <Grid container className={classes.answerContainer}>
           <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[0] === 'undefined' ? null : <Unchecked answer={answers[0].answer} order={0} check={answers[0].sel} /> }</Grid>
           <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[1] === 'undefined' ? null : <Unchecked answer={answers[1].answer} order={1} check={answers[1].sel} /> }</Grid>
           <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[2] === 'undefined' ? null : <Unchecked answer={answers[2].answer} order={2} check={answers[2].sel} /> }</Grid>
@@ -158,7 +158,7 @@ export default function NewQuiz() {
       );
     } else {
       setAnswerGraphic(
-        <Grid container xs={12} className={classes.answerContainer}>
+        <Grid container className={classes.answerContainer}>
           <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers === 'undefined' ? null : <Checked order={0} check={answers === 0 ? 0 : 1} /> }</Grid>
           <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers === 'undefined' ? null : <Checked order={1} check={answers === 0 ? 1 : 0} /> }</Grid>
         </Grid>

@@ -30,6 +30,7 @@ const ProfileDetails = ({ className, ...rest }) => {
     const userObject = JSON.parse(currentUser);
     setProfile(userObject);
   }, [localStorage]);
+
   const handleChangeName = (event) => {
     const newStore = {
       userAvatar: localStore.userAvatar,
@@ -40,9 +41,13 @@ const ProfileDetails = ({ className, ...rest }) => {
       userSchool: localStore.userSchool,
       userType: localStore.userType,
       user_birth: localStore.user_birth,
+      userMembership: localStore.userMembership,
+      userMemberdate: localStore.userMemberdate,
+      userBadge: localStore.userBadge
     };
     setProfile(newStore);
   };
+
   const handleChangeEmail = (event) => {
     const newStore = {
       userAvatar: localStore.userAvatar,
@@ -53,6 +58,9 @@ const ProfileDetails = ({ className, ...rest }) => {
       userSchool: localStore.userSchool,
       userType: localStore.userType,
       user_birth: localStore.user_birth,
+      userMembership: localStore.userMembership,
+      userMemberdate: localStore.userMemberdate,
+      userBadge: localStore.userBadge
     };
     setProfile(newStore);
   };
@@ -66,6 +74,9 @@ const ProfileDetails = ({ className, ...rest }) => {
       userSchool: localStore.userSchool,
       userType: localStore.userType,
       user_birth: localStore.user_birth,
+      userMembership: localStore.userMembership,
+      userMemberdate: localStore.userMemberdate,
+      userBadge: localStore.userBadge
     };
     setProfile(newStore);
   };
@@ -79,6 +90,9 @@ const ProfileDetails = ({ className, ...rest }) => {
       userSchool: event.target.value,
       userType: localStore.userType,
       user_birth: localStore.user_birth,
+      userMembership: localStore.userMembership,
+      userMemberdate: localStore.userMemberdate,
+      userBadge: localStore.userBadge
     };
     setProfile(newStore);
   };
@@ -92,6 +106,9 @@ const ProfileDetails = ({ className, ...rest }) => {
       userSchool: localStore.userSchool,
       userType: localStore.userType,
       user_birth: date,
+      userMembership: localStore.userMembership,
+      userMemberdate: localStore.userMemberdate,
+      userBadge: localStore.userBadge
     };
     setProfile(newStore);
   };
@@ -99,6 +116,7 @@ const ProfileDetails = ({ className, ...rest }) => {
     console.log(profile);
     await updateProfile(profile).then(() => {
       localStorage.setItem('brainaly_user', JSON.stringify(profile));
+      window.location = `/${profile.userType}/account`;
     });
   };
   return (
@@ -119,22 +137,6 @@ const ProfileDetails = ({ className, ...rest }) => {
             container
             spacing={3}
           >
-            {/* <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                helperText="Please specify the first name"
-                label="First name"
-                name="firstName"
-                onChange={handleChange}
-                required
-                value={values.firstName}
-                variant="outlined"
-              />
-            </Grid> */}
             <Grid
               item
               md={6}

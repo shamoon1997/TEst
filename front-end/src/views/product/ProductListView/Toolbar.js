@@ -197,7 +197,7 @@ const Toolbar = ({ className, ...rest }) => {
       >
         <DialogTitle id="alert-dialog-title">Create a New Quiz</DialogTitle>
         <DialogContent>
-          <Grid container xs={12}>
+          <Grid container spacing={2}>
             <Grid item xs={12} sm={6} style={{ marginTop: 20 }}>
               <TextField
                 variant="outlined"
@@ -260,12 +260,6 @@ const Toolbar = ({ className, ...rest }) => {
         display="flex"
         justifyContent="flex-end"
       >
-        {/* <Button className={classes.importButton}>
-          Import
-        </Button>
-        <Button className={classes.exportButton}>
-          Export
-        </Button> */}
         <Button
           color="primary"
           variant="contained"

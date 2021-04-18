@@ -45,7 +45,6 @@ const useStyles = makeStyles(() => ({
     marginLeft: 20
   },
   menuIcon: {
-    color: '#01025C',
     marginRight: 20
   }
 }));
@@ -96,10 +95,9 @@ const TopBar = ({
         <Box flexGrow={1} />
         <Hidden mdDown>
           <IconButton>
-            <NotificationsIcon color="#01025C" />
+            <NotificationsIcon />
           </IconButton>
           <IconButton
-            color="#01025C"
             onClick={handleMenuClick}
           >
             <SettingsIcon />
@@ -129,13 +127,11 @@ const TopBar = ({
         </Hidden>
         <Hidden lgUp>
           <IconButton
-            color="#01025C"
             onClick={onMobileNavOpen}
           >
             <MenuIcon />
           </IconButton>
           <IconButton
-            color="#01025C"
             onClick={handleMenuClick}
           >
             <SettingsIcon />

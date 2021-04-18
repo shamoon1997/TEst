@@ -11,6 +11,8 @@ const host = 'localhost';
 const user = 'root';
 const password = '';
 const database = 'brainaly';
+var saltRounds = 10;
+var limitNum = 5;
 
 function runQuery(query1){
   return new Promise(resolve => {
@@ -38,8 +40,7 @@ const {
 } = require("./helper");
 
 con.connect();
-var saltRounds = 10;
-var limitNum = 3;
+
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'upload')
@@ -177,7 +178,6 @@ router.post("/signin", async (req, res) => {
   const query1 = "select * from users where u_email = '" + userEmail + "'";
   res.setHeader('Content-Type', 'text/html');
   await con.query(query1, (err, result, fields) => {
-    console.log(result[0].u_pwd, userPwd, "when user signin", result)
     if (err) throw err;
     if (result.length) {
       bcrypt.compare(userPwd, result[0].u_pwd, function(err, isMatch) {
@@ -541,10 +541,13 @@ router.post("/updateprofile", async (req, res) => {
   console.log(query);
   await con.query(query, (err, result) => {
     if(err) throw err;
-    res.json({
-      data: result,
-      message: 'success'
-    })
+    con.query("SELECT * FROM `users` WHERE `u_id` = "+req.body.userId, ()=>{
+      res.json({
+        data: result,
+        message: 'success'
+      })
+    });
+    
   });
 });
 
@@ -601,7 +604,7 @@ router.post("/getmessage", async (req, res) => {
 });
 
 router.post("/readmesage", async (req, res) => {
-  const query = "UPDATE `chats` SET `m_read_at`= '"+moment().format()+"' WHERE `m_from_id` = '"+req.body.from_id+"' AND "+ "`m_to_id` = "+req.body.to_id ;
+  const query = "UPDATE `chats` SET `m_read_at`= 'read' WHERE `m_from_id` = '"+req.body.from_id+"' AND "+ "`m_to_id` = "+req.body.to_id ;
   console.log(query);
   await con.query(query, (err, result) => {
     if(err) throw err;

@@ -55,7 +55,6 @@ const Profile = ({ className, ...rest }) => {
       e.preventDefault();
       const reader = URL.createObjectURL(e.target.files[0]);
       await imageUpload(e.target.files[0]).then((res) => {
-        console.log(res.data.filename);
         const localStore = profile;
         const newStore = {
           userAvatar: res.data.filename,
@@ -66,6 +65,9 @@ const Profile = ({ className, ...rest }) => {
           userSchool: localStore.userSchool,
           userType: localStore.userType,
           user_birth: localStore.user_birth,
+          userMembership: localStore.userMembership,
+          userMemberdate: localStore.userMemberdate,
+          userBadge: localStore.userBadge
         };
         setProfile(newStore);
         localStorage.setItem('brainaly_user', JSON.stringify(newStore));

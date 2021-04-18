@@ -26,6 +26,7 @@ import Logo from 'src/components/Logo';
 import StoreContext from 'src/context/index';
 import { updateQuizData } from 'src/utils/Api';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import cogoToast from 'cogo-toast';
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -93,7 +94,7 @@ const TopBar = ({
       userid: user.userId
     };
     await updateQuizData(data).then((res) => {
-      console.log(res);
+      cogoToast.success('Saved successfully', { position: 'bottom-right' });
     });
   }
   const logOut = () => {
