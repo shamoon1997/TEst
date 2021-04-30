@@ -70,7 +70,7 @@ const LoginView = () => {
                   userPwd: values.password
                 }).then((res) => {
                   if (typeof res === 'undefined') {
-                    cogoToast.error('SignIn Failed', { position: 'bottom-right' });
+                    cogoToast.error('SignIn Failed', { position: 'top-right' });
                   }
                   if (res.flag) {
                     setStore({
@@ -102,14 +102,13 @@ const LoginView = () => {
                         navigate('/teacher/home', { replace: true });
                       } else if (res.data.u_type === 'student') {
                         navigate('/student/home', { replace: true });
-                        cogoToast.warn('Go to student Panel', { position: 'bottom-right' });
                       } else {
                         // navigate('/', { replace: true });
                       }
                     }, 1500);
                   } else {
                     setIsLoading(false);
-                    cogoToast.warn(res.msg, { position: 'bottom-right' });
+                    cogoToast.warn(res.msg, { position: 'top-right' });
                   }
                 }).catch(() => {
                   setIsLoading(false);

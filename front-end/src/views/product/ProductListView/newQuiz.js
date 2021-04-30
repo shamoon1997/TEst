@@ -9,6 +9,7 @@
 import React, { useEffect, useState } from 'react';
 import StoreContext from 'src/context/index';
 import ImageSearchIcon from '@material-ui/icons/ImageSearch';
+import { useNavigate } from 'react-router-dom';
 import CancelIcon from '@material-ui/icons/Cancel';
 import {
   makeStyles,
@@ -20,6 +21,7 @@ import {
 import PropTypes from 'prop-types';
 import { getQuizById, imageUpload } from 'src/utils/Api';
 import global from 'src/utils/global';
+import authChecker from 'src/utils/authHelper';
 import Unchecked from './answers/unchecked';
 import Checked from './answers/checked';
 
@@ -97,6 +99,7 @@ const useStyle = makeStyles((theme) => ({
 }));
 export default function NewQuiz() {
   const handle = window.location.search;
+  const navigate = useNavigate();
   const id = new URLSearchParams(handle).get('id');
   const classes = useStyle();
   const [imageSource, setImageSource] = useState('');
@@ -110,6 +113,10 @@ export default function NewQuiz() {
   useEffect(() => {
     // get data with
     async function getData() {
+      if (!authChecker('authCheck')) {
+        navigate('/', { replace: true });
+        return;
+      }
       const req = { id };
       await getQuizById(req).then((res) => {
         const jsonData = JSON.parse(res[0].q_content);

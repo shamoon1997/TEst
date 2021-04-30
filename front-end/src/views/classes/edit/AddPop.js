@@ -143,7 +143,7 @@ export default function AddDialog({
   React.useEffect(() => {
     async function getList() {
       const user = JSON.parse(localStorage.getItem('brainaly_user'));
-      await getQuizList({ userid: user.userId }).then((res) => {
+      await getQuizList({ userid: user?.userId }).then((res) => {
         const productsArray = [];
         const prolistArray = [];
         const selectedQuizString = JSON.stringify(collection.quizList);

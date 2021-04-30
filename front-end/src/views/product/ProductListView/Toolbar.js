@@ -23,6 +23,7 @@ import {
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
+import ClearIcon from '@material-ui/icons/Clear';
 import StoreContext from 'src/context/index';
 import { newQuiz, imageUpload } from 'src/utils/Api';
 
@@ -85,7 +86,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Toolbar = ({ className, ...rest }) => {
+const Toolbar = ({
+  className, searchQuz, schLoading, ...rest
+}) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const { store, setStore } = React.useContext(StoreContext);
@@ -97,6 +100,7 @@ const Toolbar = ({ className, ...rest }) => {
   const [description, setDescription] = useState('');
   const [imageSource, setImageSource] = useState('');
   const [coverImageName, setCoverImageName] = useState('');
+  const [searchKey, setSearchKey] = useState('');
   const handleClose = () => {
     setOpen(false);
     setIsLoading(false);
@@ -107,7 +111,11 @@ const Toolbar = ({ className, ...rest }) => {
   function uniqueID() {
     return `${chr4() + chr4()}-${chr4()}-${chr4()}-${chr4()}-${chr4()}${chr4()}${chr4()}`;
   }
-
+  function closeSearch() {
+    setSearchKey('');
+    searchQuz('');
+    console.log('refresh');
+  }
   const handleNew = async () => {
     if (newTitle.length < 3) {
       setValid('valid');
@@ -274,19 +282,32 @@ const Toolbar = ({ className, ...rest }) => {
             <Box maxWidth={500}>
               <TextField
                 fullWidth
+                value={searchKey}
+                onChange={(e) => { setSearchKey(e.target.value); }}
+                onKeyPress={(e) => { searchQuz(e); }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SvgIcon
-                        fontSize="small"
-                        color="action"
-                      >
-                        <SearchIcon />
-                      </SvgIcon>
+
+                      {schLoading ? <CircularProgress color="secondary" size={19} className="pregress" /> : (
+                        <SvgIcon
+                          fontSize="small"
+                          color="action"
+                        >
+                          <SearchIcon />
+                        </SvgIcon>
+                      ) }
                     </InputAdornment>
+                  ),
+                  endAdornment: (
+                    searchKey ? (
+                      <InputAdornment position="end" onClick={() => { closeSearch(); }} className="endAdornment">
+                        <ClearIcon size={19} />
+                      </InputAdornment>
+                    ) : null
                   )
                 }}
-                placeholder="Search quiz"
+                placeholder="Search quiz(title or description)"
                 variant="outlined"
               />
             </Box>
@@ -298,7 +319,9 @@ const Toolbar = ({ className, ...rest }) => {
 };
 
 Toolbar.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+  searchQuz: PropTypes.func,
+  schLoading: PropTypes.bool
 };
 
 export default Toolbar;

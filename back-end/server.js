@@ -39,28 +39,99 @@ const {
   connectRoom,
   getDataFromSocket,
   getUserStatus,
-  newMessage
+  newMessage,
 } = require("./socket/socket");
 
+const {
+  createGame,
+  joinGame,
+  getGame,
+  getGamePlayers,
+  checkPinCode,
+  disconnectPlayer,
+  startQuiz,
+  updateAnswer,
+  nextQuiz,
+  toMidState,
+  reJoinGame
+} = require('./socketGame/game');
 io.on("connection", function(socket) {
+  console.log('new connection of socket');
+  socket.emit('rejoinGame');
+  socket.on('Rjoingame', (data)=>{
+    reJoinGame(data, socket);
+  })
   socket.on('connectRoom', (data)=>{
     var users = connectRoom(data, socket);
     socket.broadcast.emit("newUser", data);
   })
 
+  socket.on('createGame', (data) => {
+    createGame(data);
+    socket.emit('createdGame', data);
+  })
+
+  socket.on('joingame', (data) => {
+    var { gameUsers, gameContent } = joinGame(data, socket);
+    // if( userType == 'player') {
+    socket.emit('newUserJoined', gameUsers);
+    socket.emit('updatedGameInfo', gameContent);
+    socket.broadcast.emit('newUserJoined', gameUsers);
+    socket.broadcast.emit('updatedGameInfo', gameContent);
+    // }
+  })
+
+  socket.on('getGameInfo',async (data) => {
+    var gameContent = getGame(data);
+    var gameUsers = getGamePlayers(data);
+    socket.emit('newUserJoined', gameUsers);
+    socket.emit('updatedGameInfo', gameContent);
+  })
+
+  socket.on('checkPinCode',async (pinCode) => {
+    console.log(pinCode);
+    var flag = checkPinCode(pinCode);
+    if(flag) {
+      socket.emit('okPinCode', pinCode)
+    } else {
+      socket.emit('noPinCode', pinCode)
+    }
+  })
   socket.on('getUserStatus', (users)=>{
     var statusResult = getUserStatus(users);
     socket.emit("updateUsersStatus", statusResult);
   })
+  socket.on('nextQuiz', (gameInfo)=>{
+    nextQuiz(gameInfo);
+  })
 
+  socket.on('startQuiz', (gameInfo, playerInfo)=>{
+    console.log('start quiz in server.js')
+    startQuiz(gameInfo, playerInfo);
+  })
+  
+  socket.on('updateAnswer', (data)=>{
+    console.log('start quiz in server.js', data)
+    updateAnswer(data);
+  })
+
+  socket.on('toMidState', (data)=>{
+    const { playerInfo, answerResult } = data;
+    console.log('on socker server|||||||||||||', playerInfo, answerResult);
+    toMidState(playerInfo, answerResult);
+  })
+  
   socket.on('sendMessage',async (msg) => {
     console.log(msg);
     newMessage(msg, socket);
   })
 
   socket.on('disconnect', ()=>{
+    console.log('user is disconnected')
+    // var players = disconnectPlayer(socket);
     var user = getDataFromSocket(socket);
     socket.broadcast.emit("outUser", user);
+    // socket.broadcast.emit("newUserJoined", players);
   })
 
   

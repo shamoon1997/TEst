@@ -50,6 +50,7 @@ const Users = ({
   const classes = useStyles();
   const [stCustomers, setStCustomer] = React.useState([]);
   React.useEffect(() => {
+    console.log(customers, 'customerdata is changed');
     setStCustomer(customers);
   }, [customers]);
   return (

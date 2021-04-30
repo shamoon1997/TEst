@@ -24,10 +24,11 @@ import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import EditIcon from '@material-ui/icons/Edit';
+import MenuBookIcon from '@material-ui/icons/MenuBook';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Zoom from 'react-reveal/Zoom';
-import { deleteCol } from 'src/utils/Api';
 import humanFriendlyDate from 'src/utils/Timeformat';
+import { deleteColApi } from 'src/utils/Api';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -55,16 +56,20 @@ const useStyles = makeStyles((theme) => ({
   },
   menuIcon: {
     marginRight: theme.spacing(1)
+  },
+  teach: {
+    marginLeft: 20
   }
 }));
 
 const ProductCard = ({
-  className, refresh, product, ...rest
+  className, product, refresh, ...rest
 }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState('');
+  const [hostModal, setHostModal] = useState(false);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const handleMenuClick = (event) => {
@@ -80,6 +85,12 @@ const ProductCard = ({
     navigate(`/collection/edit?id=${id}`, { replace: true });
     handleMenuClose();
   };
+  const toggleHostModal = () => {
+    setHostModal(!hostModal);
+  };
+  const gotoGamePanel = () => {
+    toggleHostModal();
+  };
   const deleteQu = (id) => {
     console.log(id);
     setDeleteId(id);
@@ -91,8 +102,7 @@ const ProductCard = ({
   }
   async function handleDelete() {
     console.log(deleteId);
-    await deleteCol({ colId: deleteId }).then((res) => {
-      console.log(res);
+    deleteColApi({ colId: deleteId }).then(() => {
       refresh();
       setDialogOpen(false);
     });
@@ -117,6 +127,25 @@ const ProductCard = ({
           </Button>
           <Button onClick={handleDelete} color="secondary" variant="contained" autoFocus>
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={hostModal}
+        onClose={toggleHostModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        key="hostModal"
+      >
+        <DialogTitle id="alert-dialog-title">Really?</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you ready to share the game with your friends?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={gotoGamePanel} color="primary" variant="contained">
+            Host
           </Button>
         </DialogActions>
       </Dialog>
@@ -258,13 +287,29 @@ const ProductCard = ({
                   {' '}
                   Plays
                 </Typography>
+                <MenuBookIcon
+                  className={classes.statsIcon}
+                  color="action"
+                />
+                <Typography
+                  color="textSecondary"
+                  display="inline"
+                  variant="body2"
+                >
+                  {product.quizNum}
+                  {' '}
+                  Quizzes
+                </Typography>
               </Grid>
               <Grid
                 className={classes.statsItem}
                 item
               >
-                <Button variant="contained" color="primary">
+                <Button variant="contained" color="primary" onClick={toggleHostModal}>
                   Play
+                </Button>
+                <Button variant="contained" color="secondary" className={classes.teach}>
+                  Teach
                 </Button>
               </Grid>
             </Grid>

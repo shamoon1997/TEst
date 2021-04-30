@@ -6,9 +6,12 @@ import {
   makeStyles
 } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
+import { useNavigate } from 'react-router-dom';
 import Page from 'src/components/Page';
 import { setSocket, emitEvent } from 'src/utils/socket';
-import { getQuizList, getQuizPageApi } from 'src/utils/Api';
+import { getQuizList, getQuizPageApi, searchQuizApi } from 'src/utils/Api';
+import Swinging from 'src/components/Swininging';
+import authChecker from 'src/utils/authHelper';
 import global from 'src/utils/global';
 import Toolbar from './Toolbar';
 import ProductCard from './ProductCard';
@@ -26,10 +29,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 const ProductList = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [proTotalNum, setProTotalNum] = useState(0);
   const [pageNum, setPageNum] = useState(1);
+  const [searchLoading, setSearchLoading] = useState(false);
   useEffect(() => {
+    if (!authChecker('authCheck')) navigate('/', { replace: true });
     const user = JSON.parse(localStorage.getItem('brainaly_user'));
     async function getList() {
       await getQuizList({ userid: user.userId }).then((res) => {
@@ -56,13 +62,14 @@ const ProductList = () => {
     setSocket();
     emitEvent('connectRoom', user);
   }, []);
-  async function refresh() {
-    const user = JSON.parse(localStorage.getItem('brainaly_user'));
-    getQuizPageApi({ userid: user.userId, pageNum: 0 }).then((res) => {
+  async function searchPage(query) {
+    setSearchLoading(true);
+    const userS = JSON.parse(localStorage.getItem('brainaly_user'));
+    searchQuizApi({
+      searchQuery: query.trim(),
+      userId: userS.userId,
+    }).then((res) => {
       const productsArray = [];
-      console.log(res);
-      setPageNum(1);
-      setProTotalNum(Math.ceil(res.total / 3));
       for (let i = 0; i < res.result.length; i++) {
         const newData = {
           title: res.result[i].q_name,
@@ -70,6 +77,37 @@ const ProductList = () => {
           description: res.result[i].q_description,
           id: res.result[i].q_uid,
           media: res.result[i].q_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].q_cover}`,
+          created: res.result[i].q_created_at
+        };
+        productsArray.push(newData);
+      }
+      console.log(productsArray);
+      setProducts(productsArray);
+      setTimeout(() => {
+        setSearchLoading(false);
+      }, 500);
+    }).catch((err) => {
+      console.log(err);
+      setTimeout(() => {
+        setSearchLoading(false);
+      }, 500);
+    });
+  }
+  async function refresh() {
+    const user = JSON.parse(localStorage.getItem('brainaly_user'));
+    getQuizPageApi({ userid: user.userId, pageNum: 0 }).then((res) => {
+      const productsArray = [];
+      console.log(res);
+      setPageNum(1);
+      setProTotalNum(Math.ceil(res.total / global.pageNationLimit));
+      for (let i = 0; i < res.result.length; i++) {
+        const newData = {
+          title: res.result[i].q_name,
+          length: JSON.parse(res.result[i].q_content).length,
+          description: res.result[i].q_description,
+          id: res.result[i].q_uid,
+          media: res.result[i].q_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].q_cover}`,
+          created: res.result[i].q_created_at
         };
         productsArray.push(newData);
       }
@@ -77,14 +115,24 @@ const ProductList = () => {
       setProducts(productsArray);
     });
   }
-
+  async function search(e) {
+    if (!e) {
+      console.log('refresh');
+      refresh();
+    } else if (e.key === 'Enter' && e.target.value.trim().length) {
+      searchPage(e.target.value, 0);
+      setProTotalNum(0);
+    } else if (e.key === 'Enter' && !e.target.value.trim().length) {
+      refresh();
+    }
+  }
   async function getQuizPage(num) {
     const user = JSON.parse(localStorage.getItem('brainaly_user'));
     getQuizPageApi({ userid: user.userId, pageNum: num }).then((res) => {
       const productsArray = [];
       console.log(res);
       setPageNum(num);
-      setProTotalNum(Math.ceil(res.total / 3));
+      setProTotalNum(Math.ceil(res.total / global.pageNationLimit));
       for (let i = 0; i < res.result.length; i++) {
         const newData = {
           title: res.result[i].q_name,
@@ -92,6 +140,7 @@ const ProductList = () => {
           description: res.result[i].q_description,
           id: res.result[i].q_uid,
           media: res.result[i].q_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].q_cover}`,
+          created: res.result[i].q_created_at
         };
         productsArray.push(newData);
       }
@@ -105,42 +154,58 @@ const ProductList = () => {
       title="Questions"
     >
       <Container maxWidth={false}>
-        <Toolbar />
+        <Toolbar searchQuz={search} schLoading={searchLoading} />
         <Box mt={3}>
           <Grid
             container
             spacing={3}
           >
-            {products.map((product) => (
-              <Grid
-                item
-                key={product.id}
-                lg={12}
-                md={12}
-                xs={12}
-              >
-                <ProductCard
-                  className={classes.productCard}
-                  product={product}
-                  handleRefresh={refresh}
-                />
-              </Grid>
-            ))}
+            {products.length
+              ? products.map((product) => (
+                <Grid
+                  item
+                  key={product.id}
+                  lg={12}
+                  md={12}
+                  xs={12}
+                >
+                  <ProductCard
+                    className={classes.productCard}
+                    product={product}
+                    handleRefresh={refresh}
+                  />
+                </Grid>
+              )) : (
+                <Grid
+                  item
+                  lg={12}
+                  md={12}
+                  xs={12}
+                >
+                  <Swinging textProps="No Quiz" />
+                </Grid>
+              )}
           </Grid>
         </Box>
-        <Box
-          mt={3}
-          display="flex"
-          justifyContent="center"
-        >
-          <Pagination
-            color="primary"
-            count={proTotalNum}
-            size="small"
-            page={pageNum}
-            onChange={(e, page) => { getQuizPage(page); }}
-          />
-        </Box>
+        {
+          !proTotalNum ? null
+            : (
+              <Box
+                mt={3}
+                display="flex"
+                justifyContent="center"
+              >
+                <Pagination
+                  color="primary"
+                  count={proTotalNum}
+                  size="small"
+                  page={pageNum}
+                  onChange={(e, page) => { getQuizPage(page); }}
+                />
+              </Box>
+            )
+        }
+
       </Container>
     </Page>
   );

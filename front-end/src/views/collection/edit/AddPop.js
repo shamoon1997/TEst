@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable no-undef */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unused-vars */
@@ -12,7 +13,7 @@ import {
   DialogContent,
   DialogContentText,
   CircularProgress,
-  Typography,
+  useTheme,
   makeStyles,
   Grid,
   Paper,
@@ -21,6 +22,7 @@ import {
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import SearchIcon from '@material-ui/icons/Search';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import CollectionContext from 'src/context/collection';
 import { getQuizList, updateColQuiz } from 'src/utils/Api';
 import global from 'src/utils/global';
@@ -100,9 +102,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 10
   },
   dialogContainer: {
-    height: '70vh',
-    minHeight: '70vh',
-    minWidth: '40vw',
+    width: 'fit-content',
     display: 'flex',
     justifyContent: 'space-between'
   }
@@ -120,7 +120,8 @@ export default function AddDialog({
   const [products, setProducts] = useState([]);
   const [proList, setProList] = useState([]);
   const [quizes, setQuizes] = useState([]);
-
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   async function handleNew() {
     const quizString = JSON.stringify(quizes);
     const data = { uid: id, quiz: quizString };
@@ -143,7 +144,7 @@ export default function AddDialog({
   React.useEffect(() => {
     async function getList() {
       const user = JSON.parse(localStorage.getItem('brainaly_user'));
-      await getQuizList({ userid: user.userId }).then((res) => {
+      await getQuizList({ userid: user?.userId }).then((res) => {
         const productsArray = [];
         const prolistArray = [];
         const selectedQuizString = JSON.stringify(collection.quizList);
@@ -155,8 +156,7 @@ export default function AddDialog({
             description: res.result[i].q_description,
             id: res.result[i].q_uid,
             selected: lNum > 0 ? 2 : 1,
-            media: res.result[i].q_cover === null
-              ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].q_cover}`
+            media: res.result[i].q_cover
           };
           const newDataPro = {
             title: res.result[i].q_name,
@@ -189,8 +189,7 @@ export default function AddDialog({
             length: item.length,
             description: item.description,
             title: item.title,
-            media: item.media === null
-              ? '/static/collection.png' : `${global.serverUrl}upload/${item.media}`,
+            media: item.media,
             selected: item.selected
           });
         }
@@ -246,6 +245,9 @@ export default function AddDialog({
       aria-describedby="alert-dialog-description"
       disableBackdropClick
       disableEscapeKeyDown
+      fullScreen={fullScreen}
+      minWidth="lg"
+      width="lg"
     >
       <DialogTitle id="alert-dialog-title">
         Add Quizes to this collection
@@ -263,7 +265,7 @@ export default function AddDialog({
       </DialogTitle>
       <DialogContent className={classes.dialogContainer}>
         <DialogContentText id="alert-dialog-description">
-          <Grid container xs={12}>
+          <Grid container xs={12} style={{ minWidth: '30vw' }}>
             <Grid item xs={12} md={12} sm={12}>
               <Grid
                 container

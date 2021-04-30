@@ -7,6 +7,9 @@ import 'src/mixins/chartjs';
 import theme from 'src/theme';
 import routes from 'src/routes';
 import './App.css';
+import './Swinging.css';
+import './carousel.min.css';
+import './countdown.css';
 
 const App = () => {
   const routing = useRoutes(routes);

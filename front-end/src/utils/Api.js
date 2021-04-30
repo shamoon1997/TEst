@@ -15,10 +15,8 @@ export async function signUp(userInfo) {
     if (res.status === 200) {
       return res.data;
     }
-    cogoToast.warn('Signup Failed', { position: 'bottom-right' });
     return res.data;
   }).catch((err) => {
-    cogoToast.warn(err, { position: 'bottom-right' });
     console.log(err);
   });
   return DATA;
@@ -29,10 +27,8 @@ export async function signIn(userInfo) {
     if (res.status === 200) {
       return res.data;
     }
-    cogoToast.warn('Signin Failed', { position: 'bottom-right' });
     return res.data;
   }).catch((err) => {
-    cogoToast.warn(err, { position: 'bottom-right' });
     console.log(err);
   });
   return DATA;
@@ -72,6 +68,28 @@ export async function getQuizList(id) {
 export async function getQuizPageApi(query) {
   console.log(query);
   const DATA = await Axios.post('getquizpage', query).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  });
+  return DATA;
+}
+
+export async function searchQuizApi(query) {
+  console.log(query);
+  const DATA = await Axios.post('searchquiz', query).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  });
+  return DATA;
+}
+
+export async function searchColApi(query) {
+  console.log(query);
+  const DATA = await Axios.post('searchcol', query).then((res) => {
     if (res.status === 200) {
       return res.data;
     }
@@ -123,7 +141,7 @@ export async function newCollection(data) {
   return DATA;
 }
 
-export async function deleteCol(id) {
+export async function deleteColApi(id) {
   const DATA = await Axios.post('deleteCol', id).then((res) => {
     if (res.status === 200) {
       return res.data;
@@ -218,6 +236,17 @@ export async function getClassList(id) {
   });
   return DATA;
 }
+
+export async function getClassListAll(id) {
+  const DATA = await Axios.post('getclasslistall', id).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  });
+  return DATA;
+}
+
 export async function getClassById(id) {
   const DATA = await Axios.post('getclassbyid', id).then((res) => {
     if (res.status === 200) {
@@ -253,6 +282,16 @@ export async function updateProfile(data) {
       return res.data.data;
     }
     return res.data.data;
+  });
+  return DATA;
+}
+
+export async function searchClassApi(data) {
+  const DATA = await Axios.post('searchclass', data).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
   });
   return DATA;
 }

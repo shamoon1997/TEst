@@ -16,13 +16,9 @@ import {
 } from 'react-feather';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import ChatIcon from '@material-ui/icons/Chat';
+import ContactMailIcon from '@material-ui/icons/ContactMail';
+import global from 'src/utils/global';
 import NavItem from './NavItem';
-
-const user = {
-  avatar: '/static/images/avatars/avatar_6.png',
-  jobTitle: 'Senior Developer',
-  name: 'Katarina Smith'
-};
 
 const items = [
   {
@@ -44,6 +40,11 @@ const items = [
     href: '/app/chat?id=',
     icon: ChatIcon,
     title: 'Chat Room'
+  },
+  {
+    href: '/teacher/contact',
+    icon: ContactMailIcon,
+    title: 'Contact Us'
   }
 ];
 
@@ -67,7 +68,13 @@ const useStyles = makeStyles(() => ({
 const NavBar = ({ onMobileClose, openMobile }) => {
   const classes = useStyles();
   const location = useLocation();
-
+  const [profile, setProfile] = React.useState({});
+  useEffect(() => {
+    const currentUser = localStorage.getItem('brainaly_user');
+    const userObject = JSON.parse(currentUser);
+    setProfile(userObject);
+    console.log(profile);
+  }, []);
   useEffect(() => {
     if (openMobile && onMobileClose) {
       onMobileClose();
@@ -90,22 +97,26 @@ const NavBar = ({ onMobileClose, openMobile }) => {
         <Avatar
           className={classes.avatar}
           component={RouterLink}
-          src={user.avatar}
-          to="/app/account"
+          src={`${global.serverUrl}upload/${profile.userAvatar}`}
+          to="/teacher/account"
         />
-        <Typography
-          className={classes.name}
-          color="textPrimary"
-          variant="h5"
-        >
-          {user.name}
-        </Typography>
-        <Typography
-          color="textSecondary"
-          variant="body2"
-        >
-          {user.jobTitle}
-        </Typography>
+        <div className="badge-container">
+          <div>
+            <Typography
+              className={classes.name}
+              color="textPrimary"
+              variant="h5"
+            >
+              {profile.userName}
+            </Typography>
+            <Typography
+              color="textSecondary"
+              variant="body2"
+            >
+              {profile.userSchool}
+            </Typography>
+          </div>
+        </div>
       </Box>
       <Divider />
       <Box p={2}>

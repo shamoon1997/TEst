@@ -1,7 +1,9 @@
+/* eslint-disable no-useless-return */
 /* eslint-disable no-alert */
 /* eslint-disable camelcase */
 /* eslint-disable no-undef */
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -20,6 +22,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import cogoToast from 'cogo-toast';
 import { loadStripe } from '@stripe/stripe-js';
 import global from 'src/utils/global';
+import authChecker from 'src/utils/authHelper';
 import Page from 'src/components/Page';
 import { membershipUpgradeApi } from 'src/utils/Api';
 import CheckoutForm from './CheckoutForm';
@@ -60,6 +63,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MembershipStu = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [membershipType, setMembershipType] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -69,6 +73,13 @@ const MembershipStu = () => {
   const handleClose = () => {
     setDialogOpen(false);
   };
+
+  React.useEffect(() => {
+    if (!authChecker('authCheck')) {
+      navigate('/', { replace: true });
+      return;
+    }
+  }, []);
 
   const userBadgeCal = (score) => {
     if (score < 30) {
@@ -169,7 +180,7 @@ const MembershipStu = () => {
               <Box mt={3}>
                 <Card className={clsx(classes.welcome)}>
                   {
-                    profile.userMembership === 'free' ? <div className="ribbon ribbon-top-right"><span>Current</span></div> : null
+                    profile?.userMembership === 'free' ? <div className="ribbon ribbon-top-right"><span>Current</span></div> : null
                   }
                   <h1>Free</h1>
                   <p className="membership-description">
@@ -193,7 +204,7 @@ const MembershipStu = () => {
               <Box mt={3}>
                 <Card className={clsx(classes.welcome)}>
                   {
-                    profile.userMembership === 'standard' ? <div className="ribbon ribbon-top-right"><span>Current</span></div> : null
+                    profile?.userMembership === 'standard' ? <div className="ribbon ribbon-top-right"><span>Current</span></div> : null
                   }
                   <Bounce delay={1100}>
                     <img src="../static/standard-membership.png" alt="standard" className="membershipMark" />
@@ -206,7 +217,7 @@ const MembershipStu = () => {
                   </p>
                   <p className="membership-description">per month</p>
                   {
-                    profile.userMembership === 'standard' ? <p className="membership-description">{profile.userMemberdate.substring(0, 10)}</p> : null
+                    profile?.userMembership === 'standard' ? <p className="membership-description">{profile.userMemberdate.substring(0, 10)}</p> : null
                   }
                   <Button variant="contained" color="primary" className={classes.membershipBtn} onClick={() => { handleOpen('standard'); }}>Upgrade</Button>
                   <div>
@@ -229,7 +240,7 @@ const MembershipStu = () => {
               <Box mt={3}>
                 <Card className={clsx(classes.welcome)}>
                   {
-                    profile.userMembership === 'pro' ? <div className="ribbon ribbon-top-right"><span>Current</span></div> : null
+                    profile?.userMembership === 'pro' ? <div className="ribbon ribbon-top-right"><span>Current</span></div> : null
                   }
                   <Bounce delay={1500}>
                     <img src="../static/pro-membership.png" alt="standard" className="membershipMark" />
@@ -242,7 +253,7 @@ const MembershipStu = () => {
                   </p>
                   <p className="membership-description">per month</p>
                   {
-                    profile.userMembership === 'pro' ? <p className="membership-description">{profile.userMemberdate.substring(0, 10)}</p> : null
+                    profile?.userMembership === 'pro' ? <p className="membership-description">{profile.userMemberdate.substring(0, 10)}</p> : null
                   }
                   <Button variant="contained" color="primary" className={classes.membershipBtn} onClick={() => { handleOpen('pro'); }}>Upgrade</Button>
                   <div>

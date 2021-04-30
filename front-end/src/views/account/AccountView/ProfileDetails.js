@@ -10,6 +10,8 @@ import {
   Divider,
   Grid,
   TextField,
+  Fade,
+  Tooltip,
   makeStyles
 } from '@material-ui/core';
 import ProfileContext from 'src/context/profile';
@@ -17,8 +19,12 @@ import { updateProfile } from 'src/utils/Api';
 import DateFnsUtils from '@date-io/date-fns';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 
-const useStyles = makeStyles(() => ({
-  root: {}
+const useStyles = makeStyles((theme) => ({
+  root: {},
+  tooltip: {
+    color: 'white',
+    fontSize: theme.typography.pxToRem(15)
+  }
 }));
 
 const ProfileDetails = ({ className, ...rest }) => {
@@ -116,7 +122,9 @@ const ProfileDetails = ({ className, ...rest }) => {
     console.log(profile);
     await updateProfile(profile).then(() => {
       localStorage.setItem('brainaly_user', JSON.stringify(profile));
-      window.location = `/${profile.userType}/account`;
+      setTimeout(() => {
+        window.location = `/${profile.userType}/account`;
+      }, 1000);
     });
   };
   return (
@@ -129,7 +137,12 @@ const ProfileDetails = ({ className, ...rest }) => {
       <Card>
         <CardHeader
           subheader="The information can be edited"
-          title="Profile"
+          title={<div className="profile-title">Profile</div>}
+          avatar={(
+            <Tooltip TransitionComponent={Fade} title={`User Badge: ${profile.userBadge}`} classeName={classes.tooltip} arrow>
+              <img src={`../static/${profile.userBadge}.png`} alt="badge" className="badge" />
+            </Tooltip>
+)}
         />
         <Divider />
         <CardContent>

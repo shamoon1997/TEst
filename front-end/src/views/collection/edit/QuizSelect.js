@@ -1,9 +1,10 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import {
-  Avatar,
+  // Avatar,
   // Box,
   Card,
   CardContent,
@@ -13,6 +14,7 @@ import {
   Button,
 } from '@material-ui/core';
 import Zoom from 'react-reveal/Zoom';
+import global from 'src/utils/global';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,9 +76,9 @@ const ProductCard = ({
               sm={3}
               xs={5}
             >
-              <Avatar
+              <img
                 alt="Product"
-                src={product.media}
+                src={product.media == '' ? '/static/collection.png' : `${global.serverUrl}upload/${product.media}`}
                 variant="square"
                 className={clsx(classes.quAvatar, className)}
               />

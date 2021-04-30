@@ -1,19 +1,30 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Redirect } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
+import authChecker from 'src/utils/authHelper';
 
 // ----------------------------------------------------------------------
 
 function AuthProtect({ children }) {
-  console.log(children);
-  if (localStorage.getItem('brainaly_user')) {
-    return true;
+  const navigate = useNavigate();
+
+  // React.useEffect(() => {
+  //   if (!authChecker('authCheck')) {
+  //     navigate('/', { replace: true });
+  //   } else {
+  //     console.log('');
+  //     navigate(children, { replace: true });
+  //   }
+  // }, []);
+  const auth = authChecker('authCheck');
+  if (auth) {
+    return <Navigate to={children} />;
   }
-  return false;
+  return <Navigate to="/" />;
 }
 AuthProtect.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.string
 };
 
 export default AuthProtect;

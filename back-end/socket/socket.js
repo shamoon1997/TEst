@@ -89,5 +89,5 @@ module.exports = {
   connectRoom,
   getDataFromSocket,
   getUserStatus,
-  newMessage
+  newMessage,
 };

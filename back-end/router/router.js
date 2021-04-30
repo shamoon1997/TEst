@@ -213,7 +213,7 @@ router.post("/signin", async (req, res) => {
 });
 
 router.post("/getquizlist", async (req, res) => {
-  const query = "SELECT * FROM `questions` WHERE q_user_id = '"+req.body.userid+"' LIMIT "+limitNum+" OFFSET 0";
+  const query = "SELECT * FROM `questions` WHERE q_user_id = '"+req.body.userid+"' ORDER BY q_id DESC LIMIT "+limitNum+" OFFSET 0";
   var totalNum = 0;
  
   await con.query("SELECT * FROM `questions` WHERE q_user_id = '"+req.body.userid+"'", (err, result, fields) => {
@@ -239,7 +239,7 @@ router.post("/getquizpage", async (req, res) => {
     pageNum = 0
   }
   console.log(req.body, pageNum)
-  const query = "SELECT * FROM `questions`  WHERE q_user_id = '"+req.body.userid+"' LIMIT "+limitNum+" OFFSET "+pageNum * limitNum;
+  const query = "SELECT * FROM `questions`  WHERE q_user_id = '"+req.body.userid+"' ORDER BY q_id DESC LIMIT "+limitNum+" OFFSET "+pageNum * limitNum;
   var totalNum = 0;
  
   await con.query("SELECT * FROM `questions`  WHERE q_user_id = '"+req.body.userid+"'", (err, result, fields) => {
@@ -254,6 +254,52 @@ router.post("/getquizpage", async (req, res) => {
       result,
       msg: "fetch success",
       total: totalNum
+    })
+    res.send();
+  });
+});
+
+router.post("/searchquiz", async (req, res) => {
+  var queryTxt = req.body.searchQuery.split(' ');
+  // SELECT * FROM `questions`  WHERE q_user_id = 2 AND ( q_name LIKE '%te%' OR q_name LIKE '%ex%' )
+  var query = "SELECT * FROM `questions`  WHERE q_user_id = '"+req.body.userId+"' AND (";
+  queryTxt.map((txt, index)=>{
+    query += " q_name LIKE '%"+txt+"%' OR q_description LIKE '%"+txt+"%' ";
+    if ( index + 1 === queryTxt.length ) {
+      query += " )  ORDER BY q_id DESC";
+    } else {
+      query += " OR ";
+    }
+  });
+  console.log(query);
+  await con.query(query, (err, result, fields) => {
+    if(err) throw err;
+    res.json({
+      result,
+      msg: "fetch success",
+    })
+    res.send();
+  });
+});
+
+router.post("/searchcol", async (req, res) => {
+  var queryTxt = req.body.searchQuery.split(' ');
+  // SELECT * FROM `questions`  WHERE q_user_id = 2 AND ( q_name LIKE '%te%' OR q_name LIKE '%ex%' )
+  var query = "SELECT * FROM `collections`  WHERE col_user_id = '"+req.body.userId+"' AND (";
+  queryTxt.map((txt, index)=>{
+    query += " col_name LIKE '%"+txt+"%' OR col_description LIKE '%"+txt+"%' ";
+    if ( index + 1 === queryTxt.length ) {
+      query += " ) ";
+    } else {
+      query += " OR ";
+    }
+  });
+  console.log(query);
+  await con.query(query, (err, result, fields) => {
+    if(err) throw err;
+    res.json({
+      result,
+      msg: "fetch success",
     })
     res.send();
   });
@@ -405,6 +451,57 @@ router.post("/newclass", async (req, res) => {
   });
 });
 
+router.post("/searchclass", async (req, res) => {
+  var queryTxt = req.body.searchQuery.split(' ');
+  console.log("usertype ", req.body);
+  if(req.body.userType == 'student'){
+    var query = "SELECT * FROM `classes`  WHERE  (";
+    queryTxt.map((txt, index)=>{
+      query += " cl_name LIKE '%"+txt+"%' OR cl_description LIKE '%"+txt+"%' ";
+      if ( index + 1 === queryTxt.length ) {
+        query += " )  ORDER BY cl_id DESC";
+      } else {
+        query += " OR ";
+      }
+    });
+    console.log(query);
+    await con.query(query, (err, result, fields) => {
+      if(err) throw err;
+      var data = [];
+      
+      result.map((res)=>{
+        console.log(JSON.parse(res.cl_students).length,  JSON.parse(res.cl_students).indexOf(req.body.userId), "asdfasdfsadfasdf student");
+        if (JSON.parse(res.cl_students).length && JSON.parse(res.cl_students).indexOf(req.body.userId) >= 0) data.push(res);
+      })
+
+      res.json({
+        result: data,
+        msg: "fetch success",
+      })
+      res.send();
+    });
+  } else {
+    var query = "SELECT * FROM `classes`  WHERE cl_user_id = '"+req.body.userId+"' AND (";
+    queryTxt.map((txt, index)=>{
+      query += " cl_name LIKE '%"+txt+"%' OR cl_description LIKE '%"+txt+"%' ";
+      if ( index + 1 === queryTxt.length ) {
+        query += " )  ORDER BY cl_id DESC";
+      } else {
+        query += " OR ";
+      }
+    });
+    console.log(query);
+    await con.query(query, (err, result, fields) => {
+      if(err) throw err;
+      res.json({
+        result,
+        msg: "fetch success",
+      })
+      res.send();
+    });
+  }
+});
+
 router.post("/deleteclass", async (req, res) => {
   console.log(req.body)
   const query = "DELETE FROM `classes` WHERE `cl_uid` = '"+req.body.cls_uid+"'";
@@ -436,12 +533,66 @@ router.post("/getclasslist", async (req, res) => {
   await con.query(queryTotal, (err, result, fields) => {
     if (err) throw err;
     console.log(result.length)
+    if (req.body.userType == 'student') {
+      result.map(res=>{
+        console.log(JSON.parse(res.cl_students).length,  JSON.parse(res.cl_students).indexOf(req.body.userid), "totla student");
+        if (JSON.parse(res.cl_students).length && JSON.parse(res.cl_students).indexOf(req.body.userid) >= 0) totalNum++;
+      })
+    } else {
+      totalNum = result.length
+    }
+  });
+
+  await con.query(query, (err, result, fields) => {
+    if(err) throw err;
+    console.log(result)
+    var data = [];
+    if (req.body.userType == 'student') {
+      result.map((res)=>{
+        console.log(JSON.parse(res.cl_students).length,  JSON.parse(res.cl_students).indexOf(req.body.userid), "asdfasdfsadfasdf student");
+        if (JSON.parse(res.cl_students).length && JSON.parse(res.cl_students).indexOf(req.body.userid) >= 0) data.push(res);
+      })
+    } else {
+      data = result;
+    }
+    console.log({
+      result, data,
+      total: totalNum
+    }, 'response data');
+    res.json({
+      result: data,
+      total: totalNum
+    })
+  })
+});
+
+router.post("/getclasslistall", async (req, res) => {
+  var totalNum = 0;
+  var pageNum = req.body.pageNum - 1; 
+  if(pageNum < 0 ){
+    pageNum = 0
+  }
+  var query = "";
+  var queryTotal = "";
+  console.log(req.body.userType);
+
+  query = "SELECT * FROM `classes`";
+  queryTotal = "SELECT * FROM `classes`";
+  
+  await con.query(queryTotal, (err, result, fields) => {
+    if (err) throw err;
+    console.log(result.length)
     totalNum = result.length
   });
 
   await con.query(query, (err, result, fields) => {
     if(err) throw err;
     console.log(result)
+    data = result;
+    console.log({
+      result, data,
+      total: totalNum
+    }, 'response data');
     res.json({
       result,
       total: totalNum
@@ -537,7 +688,9 @@ router.post("/getstubyid", async (req, res) => {
 //Profile
 
 router.post("/updateprofile", async (req, res) => {
-  const query = "UPDATE `users` SET `u_name` = '"+req.body.userName+"',  `u_birthday` = '"+req.body.user_birth+"',  `u_email` = '"+req.body.userEmail+"', `u_school` = '"+req.body.userSchool+"',  `u_avatar` = '"+req.body.userAvatar+"', `u_phonenumber` = '"+req.body.userPhone+"' WHERE `u_id` = "+req.body.userId;
+  var birthday = new Date(req.body.user_birth);
+
+  const query = "UPDATE `users` SET `u_name` = '"+req.body.userName+"',  `u_birthday` = '"+moment(birthday).format()+"',  `u_email` = '"+req.body.userEmail+"', `u_school` = '"+req.body.userSchool+"',  `u_avatar` = '"+req.body.userAvatar+"', `u_phonenumber` = '"+req.body.userPhone+"' WHERE `u_id` = "+req.body.userId;
   console.log(query);
   await con.query(query, (err, result) => {
     if(err) throw err;
@@ -564,7 +717,7 @@ router.post("/getusers", async (req, res) => {
     users = result;
     
     for(var i = 0; i < users.length; i++){
-      const query1 = "SELECT * FROM chats WHERE m_from_id = "+users[i].u_id+" AND m_to_id = "+req.body.userId+" AND m_read_at = ''";
+      const query1 = "SELECT * FROM chats WHERE m_to_id = "+users[i].u_id+" AND m_from_id = "+req.body.userId+" AND m_read_at IS NULL";
       await callBackFnc(query1, i);
     }
 
@@ -604,7 +757,7 @@ router.post("/getmessage", async (req, res) => {
 });
 
 router.post("/readmesage", async (req, res) => {
-  const query = "UPDATE `chats` SET `m_read_at`= 'read' WHERE `m_from_id` = '"+req.body.from_id+"' AND "+ "`m_to_id` = "+req.body.to_id ;
+  const query = "UPDATE `chats` SET `m_read_at`= '"+moment().format()+"' WHERE `m_from_id` = '"+req.body.from_id+"' AND "+ "`m_to_id` = "+req.body.to_id ;
   console.log(query);
   await con.query(query, (err, result) => {
     if(err) throw err;

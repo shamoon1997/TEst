@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-return */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -24,7 +25,10 @@ const Account = () => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    if (!authChecker('authCheck')) navigate('/', { replace: true });
+    if (!authChecker('authCheck')) {
+      navigate('/', { replace: true });
+      return;
+    }
   }, []);
   return (
     <Page

@@ -22,6 +22,7 @@ import {
   Grid
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
+import ClearIcon from '@material-ui/icons/Clear';
 import { useNavigate } from 'react-router-dom';
 import StoreContext from 'src/context/index';
 import { imageUpload, newCollection } from 'src/utils/Api';
@@ -87,7 +88,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Toolbar = ({ className, ...rest }) => {
+const Toolbar = ({
+  className, searchQuz, schLoading, ...rest
+}) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const { store, setStore } = React.useContext(StoreContext);
@@ -99,6 +102,7 @@ const Toolbar = ({ className, ...rest }) => {
   const [description, setDescription] = useState('');
   const [imageSource, setImageSource] = useState('');
   const [coverImageName, setCoverImageName] = useState('');
+  const [searchKey, setSearchKey] = useState('');
   const handleClose = () => {
     setOpen(false);
     setIsLoading(false);
@@ -109,7 +113,11 @@ const Toolbar = ({ className, ...rest }) => {
   function uniqueID() {
     return `${chr4() + chr4()}-${chr4()}-${chr4()}-${chr4()}-${chr4()}${chr4()}${chr4()}`;
   }
-
+  function closeSearch() {
+    setSearchKey('');
+    searchQuz('');
+    console.log('refresh');
+  }
   const handleNew = async () => {
     if (newTitle.length < 3) {
       setValid('valid');
@@ -216,9 +224,7 @@ const Toolbar = ({ className, ...rest }) => {
                 </div>
               </Grid>
             </Grid>
-
           </DialogContentText>
-
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} variant="contained" disabled={isLoading} color="primary">
@@ -235,12 +241,6 @@ const Toolbar = ({ className, ...rest }) => {
         display="flex"
         justifyContent="flex-end"
       >
-        {/* <Button className={classes.importButton}>
-          Import
-        </Button>
-        <Button className={classes.exportButton}>
-          Export
-        </Button> */}
         <Button
           color="primary"
           variant="contained"
@@ -255,16 +255,28 @@ const Toolbar = ({ className, ...rest }) => {
             <Box maxWidth={500}>
               <TextField
                 fullWidth
+                onChange={(e) => { setSearchKey(e.target.value); }}
+                onKeyPress={(e) => { searchQuz(e); }}
+                value={searchKey}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SvgIcon
-                        fontSize="small"
-                        color="action"
-                      >
-                        <SearchIcon />
-                      </SvgIcon>
+                      {schLoading ? <CircularProgress color="secondary" size={19} className="progress" /> : (
+                        <SvgIcon
+                          fontSize="small"
+                          color="action"
+                        >
+                          <SearchIcon />
+                        </SvgIcon>
+                      ) }
                     </InputAdornment>
+                  ),
+                  endAdornment: (
+                    searchKey ? (
+                      <InputAdornment position="end" onClick={() => { closeSearch(); }} className="endAdornment">
+                        <ClearIcon size={19} />
+                      </InputAdornment>
+                    ) : null
                   )
                 }}
                 placeholder="Search collection"
@@ -279,7 +291,9 @@ const Toolbar = ({ className, ...rest }) => {
 };
 
 Toolbar.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+  searchQuz: PropTypes.func,
+  schLoading: PropTypes.bool
 };
 
 export default Toolbar;

@@ -17,6 +17,7 @@ import {
 import MenuIcon from '@material-ui/icons/Menu';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PersonIcon from '@material-ui/icons/Person';
+// import global from 'src/utils/global';
 import CardMembershipIcon from '@material-ui/icons/CardMembership';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import { v4 as uuid } from 'uuid';

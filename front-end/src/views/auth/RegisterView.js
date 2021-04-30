@@ -27,6 +27,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Page from 'src/components/Page';
 import { signUp } from 'src/utils/Api';
+import StoreContext from 'src/context/index';
 import cogoToast from 'cogo-toast';
 
 const useStyles = makeStyles((theme) => ({
@@ -44,6 +45,7 @@ const useStyles = makeStyles((theme) => ({
 const RegisterView = () => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const { store, setStore } = React.useContext(StoreContext);
   const [showPassword, setShowPassword] = React.useState(false);
   const [accountType, setAcctType] = React.useState('teacher');
   const [isLoading, setIsLoading] = React.useState(false);
@@ -96,12 +98,16 @@ const RegisterView = () => {
                   userPwd: values.password,
                   userType: accountType
                 }).then((res) => {
-                  if (typeof res === 'undefined') cogoToast.error('SignUp Failed', { position: 'bottom-right' });
+                  if (typeof res === 'undefined') cogoToast.error('SignUp Failed', { position: 'top-right' });
                   if (res.flag) {
+                    setStore({
+                      ...store,
+                      verifyEmail: values.email
+                    });
                     cogoToast.success(res.msg, { position: 'bottom-right' });
                     setTimeout(() => {
                       setIsLoading(false);
-                      navigate('/signin', { replace: true });
+                      navigate('/verifyemail', { replace: true });
                     }, 1500);
                   } else {
                     setIsLoading(false);
@@ -253,6 +259,18 @@ const RegisterView = () => {
                       variant="h6"
                     >
                       Sign in
+                    </Link>
+                    {' '}
+                    Or
+                    {' '}
+                    Have already SignUp?
+                    {' '}
+                    <Link
+                      component={RouterLink}
+                      to="/verifyemail"
+                      variant="h6"
+                    >
+                      Verify
                     </Link>
                   </Typography>
                 </form>

@@ -1,3 +1,4 @@
+/* eslint-disable object-shorthand */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -17,17 +18,25 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  CircularProgress,
   DialogContentText
 } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import HelpIcon from '@material-ui/icons/Help';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Zoom from 'react-reveal/Zoom';
-import { deleteQuiz } from 'src/utils/Api';
+import { deleteQuiz, getQuizById } from 'src/utils/Api';
 import humanFriendlyDate from 'src/utils/Timeformat';
+import cogoToast from 'cogo-toast';
+import {
+  emitEvent
+} from 'src/utils/socket';
+import global from 'src/utils/global';
+// import { LaptopWindows } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -67,7 +76,11 @@ const ProductCard = ({
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [hostModal, setHostModal] = useState(false);
   const [deleteId, setDeleteId] = useState('');
+  const [makingGame, setMakingGame] = useState(false);
+  const [gameType, setGameType] = useState('');
+  const [gamePin, setGamePin] = useState(0);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const handleMenuClick = (event) => {
@@ -82,6 +95,55 @@ const ProductCard = ({
     // window.open(`/teacher/new?id=${id}`, '_blank');
     navigate(`/teacher/new?id=${id}`, { replace: true });
     handleMenuClose();
+  };
+  const toggleHostModal = (gType) => {
+    setGameType(gType);
+    setHostModal(!hostModal);
+  };
+  const createGame = () => {
+    setMakingGame(true);
+    setTimeout(async () => {
+      console.log(product);
+      await getQuizById({ id: product.id }).then((res) => {
+        if (res.length) {
+          const user = JSON.parse(localStorage.getItem('brainaly_user'));
+          const gameInfo = {
+            ownerId: user.userId,
+            ownerType: user.userType,
+            gameType: gameType,
+            gameQuizNum: JSON.parse(res[0].q_content).length,
+            gameContent: JSON.parse(res[0].q_content),
+            gameStatus: 'ready',
+            gameId: Math.random().toString(16).slice(-4),
+            sourceType: 'quiz',
+            sourceId: product.id
+          };
+          const gameUser = {
+            userId: user.userId,
+            userNickName: user.userName,
+            currentNum: 0,
+            userScore: 0,
+            userStatus: 'ready',
+            gameId: gameInfo.gameId,
+            userAnswers: []
+          };
+          emitEvent('createGame', gameInfo);
+          setGamePin(gameInfo.gameId);
+          localStorage.setItem('brainaly_game', JSON.stringify(gameUser));
+        } else {
+          cogoToast.warn('There was an erro, Please try again', { position: 'top-right' });
+        }
+        console.log(gameType);
+      });
+      setMakingGame(false);
+      toggleHostModal();
+    }, 500);
+  };
+  const gotoGamePanel = () => {
+    console.log(gamePin);
+    // setGamePin(false);
+    setHostModal(false);
+    window.open(global.gamePageUrl, '_black');
   };
   const deleteQu = (id) => {
     setDeleteId(id);
@@ -121,6 +183,45 @@ const ProductCard = ({
           </Button>
           <Button onClick={handleDelete} color="secondary" variant="contained" autoFocus>
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={hostModal}
+        onClose={toggleHostModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        key="hostModal"
+      >
+        <DialogTitle id="alert-dialog-title">Really?</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you ready to share the game with your friends?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={createGame} color="primary" variant="contained">
+            Host
+            {makingGame && <CircularProgress color="nice" size={20} className="progress" />}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={gamePin}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        key="hostModal"
+      >
+        <DialogTitle id="alert-dialog-title">Game is Created</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Please share this PIN with your friends
+            <p style={{ fontSize: 18 }}>{ gamePin }</p>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={gotoGamePanel} color="primary" variant="contained">
+            Go Game
           </Button>
         </DialogActions>
       </Dialog>
@@ -262,15 +363,28 @@ const ProductCard = ({
                   {' '}
                   Plays
                 </Typography>
+                <HelpIcon
+                  className={classes.statsIcon}
+                  color="action"
+                />
+                <Typography
+                  color="textSecondary"
+                  display="inline"
+                  variant="body2"
+                >
+                  {product.length}
+                  {' '}
+                  Questions
+                </Typography>
               </Grid>
               <Grid
                 className={classes.statsItem}
                 item
               >
-                <Button variant="contained" color="primary">
+                <Button variant="contained" color="primary" onClick={() => { toggleHostModal('play'); }}>
                   Play
                 </Button>
-                <Button variant="contained" color="secondary" className={classes.teach}>
+                <Button variant="contained" color="secondary" className={classes.teach} onClick={() => { toggleHostModal('teach'); }}>
                   Teach
                 </Button>
               </Grid>

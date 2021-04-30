@@ -1,8 +1,10 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable no-shadow */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Grid,
   makeStyles,
@@ -14,6 +16,7 @@ import {
 } from '@material-ui/core';
 import { getColById, getQuizById } from 'src/utils/Api';
 import CollectionContext from 'src/context/collection';
+import authChecker from 'src/utils/authHelper';
 import global from 'src/utils/global';
 import ProductCard from './ProductCard';
 import EditDialog from './dialog';
@@ -74,6 +77,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 export default function EditCollection() {
   const classes = useStyles();
+  const navigate = useNavigate();
   const handle = window.location.search;
   const id = new URLSearchParams(handle).get('id');
   const [product, setProduct] = useState([]);
@@ -83,6 +87,10 @@ export default function EditCollection() {
   const [selectedQuiz, setSelectedQuiz] = useState('');
 
   useEffect(() => {
+    if (!authChecker('authCheck')) {
+      navigate('/', { replace: true });
+      return;
+    }
     async function fetchData() {
       const user = JSON.parse(localStorage.getItem('brainaly_user'));
       await getColById({ id }).then(async (res) => {
@@ -90,20 +98,23 @@ export default function EditCollection() {
         setSelectedQuiz(res[0].col_quiz);
         const quizArray = [];
         for (let i = 0; i < quizList.length; i++) {
-          const data = { id: quizList[i].id, userid: user.userId };
+          const data = { id: quizList[i].id, userid: user?.userId };
           await getQuizById(data).then((res) => {
-            quizArray.push({
-              title: res[0].q_name,
-              description: res[0].q_description,
-              media: res[0].q_cover,
-              id: res[0].q_uid,
-              size: JSON.parse(res[0]?.q_content)?.length
-            });
+            console.log(res);
+            if (res.length) {
+              quizArray.push({
+                title: res[0].q_name,
+                description: res[0].q_description,
+                media: res[0].q_cover,
+                id: res[0].q_uid,
+                size: JSON.parse(res[0]?.q_content)?.length
+              });
+            }
           });
         }
         setProduct(quizArray);
         setCollection({
-          image: res[0].col_image === ''
+          image: res[0].col_image == ''
             ? '/static/collection.png' : `${global.serverUrl}upload/${res[0].col_image}`,
           description: res[0].col_description,
           title: res[0].col_name,
@@ -128,8 +139,14 @@ export default function EditCollection() {
   };
   return (
     <div className={classes.root}>
-      <Grid container xs={12} spacing={3}>
-        <Grid item xs={12} md={4}>
+      <Grid container spacing={3}>
+        <Grid
+          item
+          xl={4}
+          lg={4}
+          md={12}
+          xs={12}
+        >
           <Card className={classes.cardContainer}>
             <CardContent>
               <Typography className={classes.title} color="textSecondary" variant="h6" gutterBottom>
@@ -150,14 +167,20 @@ export default function EditCollection() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid
+          item
+          xl={8}
+          lg={8}
+          md={12}
+          xs={12}
+        >
           <Card className={classes.cardContainer}>
             <CardContent>
               <div className={classes.headerContainer}>
                 <Typography className={classes.title} color="textSecondary" variant="h6" gutterBottom>
                   Add collection content
                 </Typography>
-                <Button variant="contained" color="primary" onClick={addQuizes}>Add Quiz</Button>
+                <Button variant="contained" color="primary" onClick={addQuizes}>{collection?.product?.length ? 'Edit Quiz' : 'Add Quiz'}</Button>
               </div>
               <Divider className={classes.divider} />
               <div>

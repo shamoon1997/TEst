@@ -53,6 +53,7 @@ const JoinSection = () => {
       component="div"
       mt={15}
       className={classes.boxContainer}
+      id="joinsection"
     >
       <Grid
         container
@@ -109,7 +110,7 @@ const JoinSection = () => {
                   md={6}
                   xs={12}
                 >
-                  <Button variant="contained" color="primary" endIcon={<UsersIcon />}>Join Us</Button>
+                  <Button variant="contained" color="primary" endIcon={<UsersIcon />} onClick={() => { window.location = '/signup'; }}>Join Us</Button>
                 </Grid>
               </Grid>
             </Grid>

@@ -1,6 +1,8 @@
+/* eslint-disable no-useless-return */
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
+import authChecker from 'src/utils/authHelper';
 import NavBar from './NavBar';
 import TopBar from './TopBar';
 
@@ -35,8 +37,14 @@ const useStyles = makeStyles((theme) => ({
 
 const DashboardLayout = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-
+  React.useEffect(() => {
+    if (!authChecker('authCheck')) {
+      navigate('/', { replace: true });
+      return;
+    }
+  }, []);
   return (
     <div className={classes.root}>
       <TopBar onMobileNavOpen={() => setMobileNavOpen(true)} />

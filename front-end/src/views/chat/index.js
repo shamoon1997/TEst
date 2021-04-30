@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-shadow */
 /* eslint-disable block-scoped-var */
 /* eslint-disable no-redeclare */
 /* eslint-disable no-var */
@@ -13,12 +15,17 @@ import {
   makeStyles,
   Grid,
   Card,
+  TextField,
+  InputAdornment,
+  SvgIcon,
   Menu
 } from '@material-ui/core';
 import clsx from 'clsx';
 import Flip from 'react-reveal/Flip';
+import { Search as SearchIcon } from 'react-feather';
 import SendIcon from '@material-ui/icons/Send';
 import { useNavigate } from 'react-router-dom';
+import ClearIcon from '@material-ui/icons/Clear';
 import EmojiEmotionsIcon from '@material-ui/icons/EmojiEmotions';
 import Picker from 'emoji-picker-react';
 import { v4 as uuid } from 'uuid';
@@ -34,7 +41,6 @@ import stringify from 'src/utils/stringify';
 import CustomerMsg from './CustomerMsg';
 import MyMsg from './MyMsg';
 import Users from './Users';
-import Toolbar from './Toolbar';
 
 const useStyles = makeStyles((theme) => ({
   rootChat: {
@@ -67,16 +73,17 @@ const useStyles = makeStyles((theme) => ({
 const CustomerListView = () => {
   const classes = useStyles();
   const [users, setUsers] = React.useState([]);
+  const [filteredUsers, setFilterUsers] = React.useState([]);
   const [selId, setSelId] = React.useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [newUser, setNewUser] = React.useState('');
   const [outUser, setOutUser] = React.useState('');
   const [msgCon, setMsgCon] = React.useState('');
-  const [message, setMessage] = React.useState('');
+  const [message, setMessage] = React.useState([]);
   const [newMsg, setNewMsg] = React.useState('');
   const [profile, setProfile] = React.useState('');
   const [length, setLength] = React.useState(0);
-  console.log(length);
+  const [searchKey, setSearchKey] = React.useState('');
   const [selectedUser, setSelectedUser] = React.useState({ u_name: '', u_avatar: '' });
   const open = Boolean(anchorEl);
   const onEmojiClick = (event, emojiObject) => {
@@ -96,56 +103,84 @@ const CustomerListView = () => {
     }
   };
 
+  function searchUser(query) {
+    setSearchKey(query);
+    if (query == '') {
+      setFilterUsers(users);
+    } else {
+      const aaa = users.filter((user) => {
+        console.log(user.u_name, query, 'search users');
+        return user.u_name.toLowerCase().indexOf(query.trim().toLowerCase()) >= 0;
+      });
+      setFilterUsers(aaa);
+    }
+  }
+
+  function closeSearch() {
+    setSearchKey('');
+    searchUser('');
+    console.log('close search and refresh');
+  }
+
   const updateRead = () => {
     const user = JSON.parse(localStorage.getItem('brainaly_user'));
-    setTimeout(() => {
-      console.log({
-        to_id: selId,
-        from_id: user.userId
-      });
-      readMsgApi({
-        from_id: user.userId,
-        to_id: selId
-      }).then((res) => {
-        const temp = users;
-        console.log(temp.length);
-        temp.map((Tuser, index) => {
-          if (Tuser.u_id == res.data) {
-            temp[index].newMsgNum = 0;
-          }
-        });
-        var userTemp = [];
-        getUsers({ userId: user.userId }).then((r) => {
-          r.map((result) => {
-            userTemp.push({
-              ...result,
-              status: false
+    var flag = false;
+    users.map((user) => {
+      console.log(user);
+      if (user.u_id == selId && user.newMsgNum) flag = true;
+    });
+    if (flag) {
+      setTimeout(() => {
+        console.log({
+          to_id: selId,
+          from_id: user.userId
+        }, 'update message');
+        readMsgApi({
+          from_id: user.userId,
+          to_id: selId
+        }).then((res) => {
+          const temp = users;
+          console.log(temp.length);
+          temp.map((Tuser, index) => {
+            if (Tuser.u_id == res.data) {
+              temp[index].newMsgNum = 0;
+            }
+          });
+          var userTemp = [];
+          getUsers({ userId: user.userId }).then((r) => {
+            r.map((result) => {
+              userTemp.push({
+                ...result,
+                status: false
+              });
             });
+            userTemp.sort((x, y) => {
+              if (x.newMsgNum < y.newMsgNum) {
+                return 1;
+              }
+              if (x.newMsgNum > y.newMsgNum) {
+                return -1;
+              }
+              return 0;
+            });
+            setUsers(userTemp);
+            setFilterUsers(userTemp);
+            updateUserState(userTemp);
           });
-          userTemp.sort((x, y) => {
-            if (x.newMsgNum < y.newMsgNum) {
-              return 1;
-            }
-            if (x.newMsgNum > y.newMsgNum) {
-              return -1;
-            }
-            return 0;
-          });
-          setUsers(userTemp);
-          updateUserState(userTemp);
         });
-      });
-    }, 800);
+      }, 800);
+    }
   };
   React.useEffect(() => {
     const user = JSON.parse(localStorage.getItem('brainaly_user'));
     setProfile(user);
-    getMessageApi({ client_id: selId, userId: user.userId }).then((res) => {
+    getMessageApi({ client_id: selId, userId: user?.userId }).then((res) => {
       setMessage(res);
     });
   }, [selId]);
 
   React.useEffect(() => {
+    console.log(newUser);
     const userTemp = [];
     if (newUser) {
       users.map((user) => {
@@ -161,13 +196,16 @@ const CustomerListView = () => {
         }
       });
     }
-    if (userTemp.length) setUsers(userTemp);
+    if (userTemp.length) {
+      setUsers(userTemp);
+      setFilterUsers(userTemp);
+    }
   }, [newUser]);
 
   React.useEffect(() => {
     const userTemp = [];
     users.map((user) => {
-      if (user.u_id == outUser.userId) {
+      if (user.u_id == outUser?.userId) {
         userTemp.push({
           ...user,
           status: false
@@ -178,7 +216,10 @@ const CustomerListView = () => {
         });
       }
     });
-    if (userTemp.length) setUsers(userTemp);
+    if (userTemp.length) {
+      setFilterUsers(userTemp);
+      setUsers(userTemp);
+    }
   }, [outUser]);
 
   const scrollBottom = () => {
@@ -197,26 +238,29 @@ const CustomerListView = () => {
     const newM = newMsg.msgContent;
 
     const temp = users;
-
-    if (newMsg.from_id != profile.userId) {
+    console.log(newMsg, 'new msg content');
+    if (newMsg.from_id != profile?.userId) {
       if (newMsg.from_id == selId) {
         var tempMsg = message;
-        if (newM) tempMsg.push(newM[0]);
+        if (newM && selId) tempMsg.push(newM[0]);
         setTimeout(() => {
           setMessage(tempMsg);
         }, 300);
         setTimeout(() => {
           setLength(tempMsg.length);
+          console.log(length);
           scrollBottom();
         }, 100);
       }
       temp.map((user, index) => {
         if (user.u_id == newMsg.from_id) {
+          console.log('increase new message num');
           temp[index].newMsgNum = user.newMsgNum + 1;
         }
       });
 
       setUsers(temp);
+      setFilterUsers(temp);
     } else {
       var tempMsg = message;
       if (newM) tempMsg.push(newM[0]);
@@ -238,7 +282,7 @@ const CustomerListView = () => {
     setSocket();
     const user = JSON.parse(localStorage.getItem('brainaly_user'));
     const userTemp = [];
-    getUsers({ userId: user.userId }).then((res) => {
+    getUsers({ userId: user?.userId }).then((res) => {
       res.map((result) => {
         userTemp.push({
           ...result,
@@ -256,6 +300,7 @@ const CustomerListView = () => {
       });
       console.log(userTemp);
       setUsers(res);
+      setFilterUsers(res);
       updateUserState(userTemp);
     });
     offEvent('newUser');
@@ -265,6 +310,7 @@ const CustomerListView = () => {
     onMessageReceived('newUser', setNewUser);
     onMessageReceived('outUser', setOutUser);
     onMessageReceived('updateUsersStatus', setUsers);
+    onMessageReceived('updateUsersStatus', setFilterUsers);
     onMessageReceived('newMsg', newMessge);
     emitEvent('connectRoom', user);
   }, []);
@@ -288,11 +334,13 @@ const CustomerListView = () => {
   };
 
   const sendMessage = () => {
-    emitEvent('sendMessage', {
-      msgContent: stringify(msgCon),
-      toId: selId,
-      fromId: profile.userId
-    });
+    if (msgCon) {
+      emitEvent('sendMessage', {
+        msgContent: stringify(msgCon),
+        toId: selId,
+        fromId: profile?.userId
+      });
+    }
     setMsgCon('');
   };
 
@@ -307,7 +355,7 @@ const CustomerListView = () => {
       title="Customers"
     >
       <Container maxWidth={false}>
-        <Toolbar />
+        {/* <Toolbar /> */}
         <Grid
           container
           spacing={3}
@@ -321,7 +369,42 @@ const CustomerListView = () => {
           >
             <Flip left>
               <Box mt={3}>
-                <Users customers={users} selectedUser={selId} toUser={refresh} read={updateRead} />
+                <Card style={{ padding: 15 }}>
+                  <Box maxWidth={500}>
+                    <TextField
+                      fullWidth
+                      onChange={(e) => { searchUser(e.target.value); }}
+                      value={searchKey}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SvgIcon
+                              fontSize="small"
+                              color="action"
+                            >
+                              <SearchIcon />
+                            </SvgIcon>
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          searchKey ? (
+                            <InputAdornment position="end" onClick={() => { closeSearch(); }} className="endAdornment">
+                              <ClearIcon size={19} />
+                            </InputAdornment>
+                          ) : null
+                        )
+                      }}
+                      placeholder="Search customer"
+                      variant="outlined"
+                    />
+                  </Box>
+                </Card>
+                <Users
+                  customers={filteredUsers}
+                  selectedUser={selId}
+                  toUser={refresh}
+                  read={updateRead}
+                />
               </Box>
             </Flip>
           </Grid>
@@ -345,7 +428,7 @@ const CustomerListView = () => {
                       {
                     message.length ? message.map((msg) => {
                       return (
-                        profile.userId == msg.m_to_id ? <MyMsg content={msg} />
+                        profile?.userId == msg.m_to_id ? <MyMsg content={msg} />
                           : <CustomerMsg content={msg} selectUser={selectedUser} />
                       );
                     }) : null
@@ -392,7 +475,7 @@ const CustomerListView = () => {
                       className="msgInput"
                       value={msgCon}
                       onChange={(e) => { setMsgCon(e.target.value); }}
-                      onKeyPress={(e) => { updateRead(); keyPressHandle(e); }}
+                      onKeyPress={(e) => { keyPressHandle(e); }}
                       onClick={updateRead}
                     />
                     <SendIcon className="sendButton" fontSize="large" onClick={sendMessage} />

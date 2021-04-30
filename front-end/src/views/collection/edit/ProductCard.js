@@ -1,19 +1,16 @@
+/* eslint-disable eqeqeq */
 import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import {
-  Avatar,
+  // Avatar,
   // Box,
   Card,
   CardContent,
   Grid,
   Typography,
   makeStyles,
-  Menu,
-  MenuItem
 } from '@material-ui/core';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import DeleteIcon from '@material-ui/icons/Delete';
 import Zoom from 'react-reveal/Zoom';
 import global from 'src/utils/global';
 
@@ -50,19 +47,6 @@ const ProductCard = ({
   className, product, indexId, ...rest
 }) => {
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-  const deleteQu = (index, id) => {
-    console.log(index, id);
-    handleMenuClose();
-  };
   return (
     <Zoom>
       <Card
@@ -83,9 +67,9 @@ const ProductCard = ({
               sm={3}
               xs={5}
             >
-              <Avatar
+              <img
                 alt="Product"
-                src={product.media === null ? '/static/collection.png' : `${global.serverUrl}upload/${product.media}`}
+                src={product.media == '' ? '/static/collection.png' : `${global.serverUrl}upload/${product.media}`}
                 variant="square"
                 className={clsx(classes.quAvatar, className)}
               />
@@ -123,34 +107,6 @@ const ProductCard = ({
                 >
                   {product.description}
                 </Typography>
-              </Grid>
-              <Grid
-                item
-                xl={1}
-                lg={1}
-                md={1}
-                xs={1}
-                className={classes.hambergerContainer}
-              >
-                <MoreVertIcon
-                  onClick={handleMenuClick}
-                />
-                <Menu
-                  id="long-menu"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={open}
-                  onClose={handleMenuClose}
-                >
-                  <MenuItem
-                    key={`${product.id}1`}
-                    className={classes.menuItem}
-                    onClick={() => deleteQu(indexId, product.id)}
-                  >
-                    <DeleteIcon className={classes.menuIcon} />
-                    Delete from collection
-                  </MenuItem>
-                </Menu>
               </Grid>
             </Grid>
           </Grid>

@@ -26,6 +26,7 @@ import { Search as SearchIcon } from 'react-feather';
 import cogoToast from 'cogo-toast';
 import Zoom from 'react-reveal/Zoom';
 import { useNavigate } from 'react-router-dom';
+import ClearIcon from '@material-ui/icons/Clear';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import StoreContext from 'src/context/index';
@@ -33,6 +34,7 @@ import {
   imageUpload,
   newClass,
   getClassList,
+  getClassListAll,
   joinMemApi
 } from 'src/utils/Api';
 import humanFriendlyDate from 'src/utils/Timeformat';
@@ -101,11 +103,13 @@ const useStyles = makeStyles((theme) => ({
     display: 'none'
   },
   joinModal: {
-    width: '50vw'
+    width: 'fit-content'
   }
 }));
 
-const Toolbar = ({ refresh, className, ...rest }) => {
+const Toolbar = ({
+  refresh, className, schLoading, searchQuz, ...rest
+}) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const { store, setStore } = React.useContext(StoreContext);
@@ -121,6 +125,7 @@ const Toolbar = ({ refresh, className, ...rest }) => {
   const [totalNum, setTotalNum] = useState(0);
   const [cPageNum, setCPageNum] = useState(1);
   const [joinModal, setJoinModal] = useState(false);
+  const [searchKey, setSearchKey] = useState('');
   const userS = JSON.parse(localStorage.getItem('brainaly_user'));
   const handleClose = () => {
     setOpen(false);
@@ -132,7 +137,11 @@ const Toolbar = ({ refresh, className, ...rest }) => {
   function uniqueID() {
     return `${chr4() + chr4()}-${chr4()}-${chr4()}-${chr4()}-${chr4()}${chr4()}${chr4()}`;
   }
-
+  function closeSearch() {
+    setSearchKey('');
+    searchQuz('');
+    console.log('refresh');
+  }
   const handleNew = async () => {
     if (newTitle.length < 3) {
       setValid('valid');
@@ -202,10 +211,10 @@ const Toolbar = ({ refresh, className, ...rest }) => {
   }
   async function joinClass() {
     setIsLoading(true);
-    await getClassList({
+    await getClassListAll({
       userid: userS.userId,
       pageNum: 1,
-      userType: userS.userType
+      userType: userS?.userType
     }).then((res) => {
       const productsArray = [];
       setIsLoading(false);
@@ -267,6 +276,8 @@ const Toolbar = ({ refresh, className, ...rest }) => {
         aria-describedby="alert-dialog-description"
         disableBackdropClick
         disableEscapeKeyDown
+        minWidth="lg"
+        width="lg"
       >
         <DialogTitle id="alert-dialog-title">Create class</DialogTitle>
         <DialogContent>
@@ -487,7 +498,7 @@ const Toolbar = ({ refresh, className, ...rest }) => {
         justifyContent="flex-end"
       >
         {
-          userS.userType === 'student' ? (
+          userS?.userType === 'student' ? (
             <Button
               color="primary"
               variant="contained"
@@ -512,16 +523,28 @@ const Toolbar = ({ refresh, className, ...rest }) => {
             <Box maxWidth={500}>
               <TextField
                 fullWidth
+                value={searchKey}
+                onChange={(e) => { setSearchKey(e.target.value); }}
+                onKeyPress={(e) => { searchQuz(e); }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SvgIcon
-                        fontSize="small"
-                        color="action"
-                      >
-                        <SearchIcon />
-                      </SvgIcon>
+                      {schLoading ? <CircularProgress color="secondary" size={19} className="pregress" /> : (
+                        <SvgIcon
+                          fontSize="small"
+                          color="action"
+                        >
+                          <SearchIcon />
+                        </SvgIcon>
+                      ) }
                     </InputAdornment>
+                  ),
+                  endAdornment: (
+                    searchKey ? (
+                      <InputAdornment position="end" onClick={() => { closeSearch(); }} className="endAdornment">
+                        <ClearIcon size={19} />
+                      </InputAdornment>
+                    ) : null
                   )
                 }}
                 placeholder="Search Class"
@@ -537,7 +560,9 @@ const Toolbar = ({ refresh, className, ...rest }) => {
 
 Toolbar.propTypes = {
   className: PropTypes.string,
-  refresh: PropTypes.func
+  refresh: PropTypes.func,
+  searchQuz: PropTypes.func,
+  schLoading: PropTypes.bool
 };
 
 export default Toolbar;

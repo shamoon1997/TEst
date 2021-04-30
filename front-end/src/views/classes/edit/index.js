@@ -4,6 +4,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/img-redundant-alt */
+import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import {
   Grid,
@@ -18,6 +19,7 @@ import {
 import { getClassById, getStudentById } from 'src/utils/Api';
 import CollectionContext from 'src/context/collection';
 import { DataGrid } from '@material-ui/data-grid';
+import authChecker from 'src/utils/authHelper';
 import global from 'src/utils/global';
 import ProductCard from './ProductCard';
 import EditDialog from './dialog';
@@ -107,6 +109,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 export default function EditCollection() {
   const classes = useStyles();
+  const navigate = useNavigate();
   const handle = window.location.search;
   const id = new URLSearchParams(handle).get('id');
   const [product, setProduct] = useState([]);
@@ -124,6 +127,10 @@ export default function EditCollection() {
     return 'gold';
   };
   useEffect(() => {
+    if (!authChecker('authCheck')) {
+      navigate('/', { replace: true });
+      return;
+    }
     async function fetchData() {
       const user = JSON.parse(localStorage.getItem('brainaly_user'));
       await getClassById({ id }).then(async (res) => {
@@ -196,7 +203,7 @@ export default function EditCollection() {
                 {collection.description}
               </Typography>
               {
-                user.userType === 'student' ? null : (
+                user?.userType === 'student' ? null : (
                   <div className={classes.editButton}>
                     <Button variant="contained" color="primary" onClick={() => { handleEdit(); }} style={{ fontSize: 16 }}>Edit</Button>
                   </div>

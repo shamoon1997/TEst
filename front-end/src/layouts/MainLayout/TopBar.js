@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import {
   AppBar,
   // Badge,
+  Button,
   Box,
   Hidden,
   IconButton,
@@ -15,6 +16,7 @@ import {
 import MenuIcon from '@material-ui/icons/Menu';
 // import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import Logo from 'src/components/Logo';
+import global from 'src/utils/global';
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -45,6 +47,10 @@ const TopBar = ({
   ...rest
 }) => {
   const classes = useStyles();
+  const gotoPlay = () => {
+    localStorage.removeItem('brainaly_game');
+    window.open(global.gamePageUrl, '_black');
+  };
   // const [notifications] = useState([]);
 
   return (
@@ -59,6 +65,14 @@ const TopBar = ({
         </RouterLink>
         <Box flexGrow={1} />
         <Hidden mdDown>
+          <Button
+            color="primary"
+            onClick={gotoPlay}
+            size="large"
+            variant="contained"
+          >
+            Play
+          </Button>
           <RouterLink
             to="/home"
             className={clsx(classes.linkStyel, className)}
@@ -73,13 +87,13 @@ const TopBar = ({
           </RouterLink>
           <RouterLink
             className={clsx(classes.linkStyel, className)}
-            to="/home"
+            to="/contact"
           >
-            Way to play
+            Contact Us
           </RouterLink>
           <RouterLink
             className={clsx(classes.linkStyel, className)}
-            to="/home"
+            to="/about"
           >
             About us
           </RouterLink>

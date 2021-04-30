@@ -22,6 +22,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import HelpIcon from '@material-ui/icons/Help';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -78,6 +79,8 @@ const ProductCard = ({
     setAnchorEl(null);
   };
   const editQu = (id) => {
+    console.log(id);
+    // window.open(`/teacher/new?id=${id}`, '_blank');
     navigate(`/student/new?id=${id}`, { replace: true });
     handleMenuClose();
   };
@@ -259,6 +262,19 @@ const ProductCard = ({
                   {product.totalDownloads}
                   {' '}
                   Plays
+                </Typography>
+                <HelpIcon
+                  className={classes.statsIcon}
+                  color="action"
+                />
+                <Typography
+                  color="textSecondary"
+                  display="inline"
+                  variant="body2"
+                >
+                  {product.length}
+                  {' '}
+                  Questions
                 </Typography>
               </Grid>
               <Grid

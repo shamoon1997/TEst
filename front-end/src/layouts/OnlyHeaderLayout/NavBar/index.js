@@ -16,6 +16,8 @@ import {
 } from 'react-feather';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import ChatIcon from '@material-ui/icons/Chat';
+import ContactMailIcon from '@material-ui/icons/ContactMail';
+import global from 'src/utils/global';
 import NavItem from './NavItem';
 
 const items = [
@@ -38,6 +40,11 @@ const items = [
     href: '/app/chat?id=',
     icon: ChatIcon,
     title: 'Chat Room'
+  },
+  {
+    href: '/teacher/contact',
+    icon: ContactMailIcon,
+    title: 'Contact Us'
   }
 ];
 
@@ -94,14 +101,21 @@ const NavBar = ({ onMobileClose, openMobile }) => {
           to="/app/account"
         />
         <div className="badge-container">
-          <Typography
-            className={classes.name}
-            color="textPrimary"
-            variant="h5"
-          >
-            {profile.userName}
-          </Typography>
-          <img src={`../static/${profile.userBadge}.png`} alt="badge" className="badge" />
+          <div>
+            <Typography
+              className={classes.name}
+              color="textPrimary"
+              variant="h5"
+            >
+              {profile.userName}
+            </Typography>
+            <Typography
+              color="textSecondary"
+              variant="body2"
+            >
+              {profile.userSchool}
+            </Typography>
+          </div>
         </div>
       </Box>
       <Divider />

@@ -43,7 +43,7 @@ const items = [
     title: 'Way to play'
   },
   {
-    href: '/app/account',
+    href: '/about',
     icon: UsersIcon,
     title: 'About us'
   },
