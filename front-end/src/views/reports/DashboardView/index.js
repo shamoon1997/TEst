@@ -5,13 +5,13 @@ import {
   makeStyles
 } from '@material-ui/core';
 import Page from 'src/components/Page';
-import Budget from './Budget';
+import { getDashboardInfo } from 'src/utils/Api';
+import Teachers from './Teachers';
 import LatestOrders from './LatestOrders';
 import LatestProducts from './LatestProducts';
 import Sales from './Sales';
-import TasksProgress from './TasksProgress';
-import TotalCustomers from './TotalCustomers';
-import TotalProfit from './TotalProfit';
+import Students from './Students';
+import Classes from './Classes';
 import TrafficByDevice from './TrafficByDevice';
 
 const useStyles = makeStyles((theme) => ({
@@ -25,6 +25,33 @@ const useStyles = makeStyles((theme) => ({
 
 const Dashboard = () => {
   const classes = useStyles();
+  const [signed, setSigned] = React.useState(false);
+  const [dashboardData, setData] = React.useState({
+    latestUsers: [],
+    questions: [],
+    totalClassNum: 0,
+    totalStudentNum: 0,
+    totalTeacherNum: 0
+  });
+  React.useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem('brainaly_user'));
+    if (!userInfo || userInfo.userType !== 'admin') {
+      window.location = '/admin/signin';
+    } else {
+      setSigned(true);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (signed) {
+      getDashboardInfo().then((res) => {
+        console.log(res);
+        setData({ ...res.result });
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
+  }, [signed]);
 
   return (
     <Page
@@ -38,39 +65,30 @@ const Dashboard = () => {
         >
           <Grid
             item
-            lg={3}
-            sm={6}
-            xl={3}
+            lg={4}
+            sm={4}
+            xl={4}
             xs={12}
           >
-            <Budget />
+            <Teachers num={dashboardData.totalTeacherNum} />
           </Grid>
           <Grid
             item
-            lg={3}
-            sm={6}
-            xl={3}
+            lg={4}
+            sm={4}
+            xl={4}
             xs={12}
           >
-            <TotalCustomers />
+            <Students num={dashboardData.totalStudentNum} />
           </Grid>
           <Grid
             item
-            lg={3}
-            sm={6}
-            xl={3}
+            lg={4}
+            sm={4}
+            xl={4}
             xs={12}
           >
-            <TasksProgress />
-          </Grid>
-          <Grid
-            item
-            lg={3}
-            sm={6}
-            xl={3}
-            xs={12}
-          >
-            <TotalProfit />
+            <Classes num={dashboardData.totalClassNum} />
           </Grid>
           <Grid
             item
@@ -88,7 +106,10 @@ const Dashboard = () => {
             xl={3}
             xs={12}
           >
-            <TrafficByDevice />
+            <TrafficByDevice
+              studentsNum={dashboardData.totalStudentNum}
+              teachersNum={dashboardData.totalTeacherNum}
+            />
           </Grid>
           <Grid
             item
@@ -97,7 +118,7 @@ const Dashboard = () => {
             xl={3}
             xs={12}
           >
-            <LatestProducts />
+            <LatestProducts questions={dashboardData.questions} />
           </Grid>
           <Grid
             item
@@ -106,7 +127,7 @@ const Dashboard = () => {
             xl={9}
             xs={12}
           >
-            <LatestOrders />
+            <LatestOrders latestUsers={dashboardData.latestUsers} />
           </Grid>
         </Grid>
       </Container>

@@ -14,7 +14,7 @@ import {
   Card
 } from '@material-ui/core';
 import cogoToast from 'cogo-toast';
-import { signIn } from 'src/utils/Api';
+import { emailVerify, resendVerifyCode } from 'src/utils/Api';
 import Page from 'src/components/Page';
 import StoreContext from 'src/context/index';
 
@@ -42,6 +42,11 @@ const VerifyForm = () => {
   };
   const resend = () => {
     console.log('resend');
+    resendVerifyCode({
+      userEmail: document.getElementById('email').value
+    }).then((res) => {
+      cogoToast.success(res.msg, { position: 'top-right' });
+    });
   };
   return (
     <Page
@@ -59,50 +64,52 @@ const VerifyForm = () => {
             <Formik
               initialValues={{
                 email: store.verifyEmail,
-                password: ''
+                verifyCode: ''
               }}
               validationSchema={Yup.object().shape({
                 email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                password: Yup.string().max(255).required('Password is required')
+                verifyCode: Yup.string().max(255).required('VerifyCode is required')
               })}
               onSubmit={async (values) => {
                 setIsLoading(true);
-                signIn({
+                emailVerify({
                   userEmail: values.email,
-                  userPwd: values.password
+                  code: values.verifyCode
                 }).then((res) => {
                   if (typeof res === 'undefined') {
-                    cogoToast.error('SignIn Failed', { position: 'top-right' });
+                    cogoToast.error('Failed, Please try again', { position: 'top-right' });
                   }
                   if (res.flag) {
+                    console.log(res);
+                    cogoToast.success('Success', { position: 'top-right' });
                     setStore({
                       ...store,
                       userInfo: {
-                        userEmail: res.data.u_email,
-                        userName: res.data.u_name,
-                        userAvatar: res.data.u_avatar
+                        userEmail: res.result[0].u_email,
+                        userName: res.result[0].u_name,
+                        userAvatar: res.result[0].u_avatar
                       }
                     });
                     setTimeout(() => {
                       console.log(res);
                       const userData = {
-                        userId: res.data.u_id,
-                        userEmail: res.data.u_email,
-                        userName: res.data.u_name,
-                        userAvatar: res.data.u_avatar,
-                        user_birth: res.data.u_birthday,
-                        userType: res.data.u_type,
-                        userSchool: res.data.u_school,
-                        userPhone: res.data.u_phonenumber,
-                        userMembership: res.data.u_membership_type,
-                        userMemberdate: res.data.u_expire_date,
-                        userBadge: userBadgeCal(res.data.u_score)
+                        userId: res.result[0].u_id,
+                        userEmail: res.result[0].u_email,
+                        userName: res.result[0].u_name,
+                        userAvatar: res.result[0].u_avatar,
+                        user_birth: res.result[0].u_birthday,
+                        userType: res.result[0].u_type,
+                        userSchool: res.result[0].u_school,
+                        userPhone: res.result[0].u_phonenumber,
+                        userMembership: res.result[0].u_membership_type,
+                        userMemberdate: res.result[0].u_expire_date,
+                        userBadge: userBadgeCal(res.result[0].u_score)
                       };
                       setIsLoading(false);
                       localStorage.setItem('brainaly_user', JSON.stringify(userData));
-                      if (res.data.u_type === 'teacher') {
+                      if (res.result[0].u_type === 'teacher') {
                         navigate('/teacher/home', { replace: true });
-                      } else if (res.data.u_type === 'student') {
+                      } else if (res.result[0].u_type === 'student') {
                         navigate('/student/home', { replace: true });
                       } else {
                         // navigate('/', { replace: true });
@@ -140,42 +147,6 @@ const VerifyForm = () => {
                       variant="body2"
                     />
                   </Box>
-                  {/* <Grid
-                    container
-                    spacing={3}
-                  >
-                    <Grid
-                      item
-                      xs={12}
-                      md={6}
-                    >
-                      <Button
-                        color="primary"
-                        fullWidth
-                        startIcon={<FacebookIcon />}
-                        onClick={handleSubmit}
-                        size="large"
-                        variant="contained"
-                      >
-                        Login with Facebook
-                      </Button>
-                    </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      md={6}
-                    >
-                      <Button
-                        fullWidth
-                        startIcon={<GoogleIcon />}
-                        onClick={handleSubmit}
-                        size="large"
-                        variant="contained"
-                      >
-                        Login with Google
-                      </Button>
-                    </Grid>
-                  </Grid> */}
                   <Box
                     mt={3}
                     mb={1}
@@ -200,18 +171,19 @@ const VerifyForm = () => {
                     type="email"
                     value={values.email}
                     variant="outlined"
+                    id="email"
                   />
                   <TextField
-                    error={Boolean(touched.password && errors.password)}
+                    error={Boolean(touched.verifyCode && errors.verifyCode)}
                     fullWidth
-                    helperText={touched.password && errors.password}
-                    label="Password"
+                    helperText={touched.verifyCode && errors.verifyCode}
+                    label="Verify Code"
                     margin="normal"
-                    name="password"
+                    name="verifyCode"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    type="password"
-                    value={values.password}
+                    type="text"
+                    value={values.verifyCode}
                     variant="outlined"
                   />
                   <Box my={2}>

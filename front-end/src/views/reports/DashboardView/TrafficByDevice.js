@@ -13,9 +13,7 @@ import {
   makeStyles,
   useTheme
 } from '@material-ui/core';
-import LaptopMacIcon from '@material-ui/icons/LaptopMac';
-import PhoneIcon from '@material-ui/icons/Phone';
-import TabletIcon from '@material-ui/icons/Tablet';
+import GroupIcon from '@material-ui/icons/Group';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -23,30 +21,30 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const TrafficByDevice = ({ className, ...rest }) => {
+const TrafficByDevice = ({
+  className, studentsNum, teachersNum, ...rest
+}) => {
   const classes = useStyles();
   const theme = useTheme();
-
+  const total = (studentsNum + teachersNum) / 100;
   const data = {
     datasets: [
       {
-        data: [63, 15, 22],
+        data: [teachersNum / total, studentsNum / total],
         backgroundColor: [
           colors.indigo[500],
-          colors.red[600],
-          colors.orange[600]
+          colors.red[600]
         ],
         borderWidth: 8,
         borderColor: colors.common.white,
         hoverBorderColor: colors.common.white
       }
     ],
-    labels: ['Desktop', 'Tablet', 'Mobile']
+    labels: ['Teachers', 'Students']
   };
 
   const options = {
     animation: false,
-    cutoutPercentage: 80,
     layout: { padding: 0 },
     legend: {
       display: false
@@ -68,22 +66,16 @@ const TrafficByDevice = ({ className, ...rest }) => {
 
   const devices = [
     {
-      title: 'Desktop',
-      value: 63,
-      icon: LaptopMacIcon,
+      title: 'Teachers',
+      value: teachersNum / total,
+      icon: GroupIcon,
       color: colors.indigo[500]
     },
     {
-      title: 'Tablet',
-      value: 15,
-      icon: TabletIcon,
+      title: 'Students',
+      value: studentsNum / total,
+      icon: GroupIcon,
       color: colors.red[600]
-    },
-    {
-      title: 'Mobile',
-      value: 23,
-      icon: PhoneIcon,
-      color: colors.orange[600]
     }
   ];
 
@@ -92,7 +84,7 @@ const TrafficByDevice = ({ className, ...rest }) => {
       className={clsx(classes.root, className)}
       {...rest}
     >
-      <CardHeader title="Traffic by Device" />
+      <CardHeader title="Student and Teachers" />
       <Divider />
       <CardContent>
         <Box
@@ -113,7 +105,7 @@ const TrafficByDevice = ({ className, ...rest }) => {
             color,
             icon: Icon,
             title,
-            value
+            value,
           }) => (
             <Box
               key={title}
@@ -143,7 +135,9 @@ const TrafficByDevice = ({ className, ...rest }) => {
 };
 
 TrafficByDevice.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+  studentsNum: PropTypes.number,
+  teachersNum: PropTypes.number
 };
 
 export default TrafficByDevice;

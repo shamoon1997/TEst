@@ -47,7 +47,7 @@ const colors = [
   '#26890c'
 ];
 export default function Unchecked({
-  answer, order, check, cAnswer, updateAnswer, timeCount
+  answer, order, check, cAnswer, updateAnswer, timeCount, owner
 }) {
   const classes = useStyles();
   const [cResult, setCResult] = React.useState(cAnswer);
@@ -77,12 +77,16 @@ export default function Unchecked({
             </FormControl>
           </div>
           <div style={{ alignItems: 'center', display: 'flex' }}>
-            <IconButton
-              aria-label="delete"
-              className={classes.checking}
-            >
-              {cResult[order] == 1 ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <RadioButtonUncheckedIcon fontSize="large" className={classes.icons} />}
-            </IconButton>
+            {
+              !owner ? (
+                <IconButton
+                  aria-label="delete"
+                  className={classes.checking}
+                >
+                  {cResult[order] == 1 ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <RadioButtonUncheckedIcon fontSize="large" className={classes.icons} />}
+                </IconButton>
+              ) : null
+            }
           </div>
         </div>
       </Card>
@@ -95,5 +99,6 @@ Unchecked.propTypes = {
   check: PropTypes.bool,
   updateAnswer: PropTypes.func,
   cAnswer: PropTypes.array,
-  timeCount: PropTypes.number
+  timeCount: PropTypes.number,
+  owner: PropTypes.bool
 };

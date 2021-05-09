@@ -120,7 +120,27 @@ const checkPinCode = (pinCode) => {
 
   return flag;
 }
+const endGameMake = (gameId) => {
+  var gameUsers = getGamePlayers({gameId: gameId});
+  gameUsers.map(gameU => {
+    emitEvent('updatedGameInfo', {}, gameU.userId);
+  })
+  games = games.filter((game)=>{
+    return game.gameId != gameId;
+  })
 
+  var tempPlayers = [];
+  players.map((p) => {
+    if (p.gameId != gameId) tempPlayers.push(p);
+  });
+  
+  players = tempPlayers;
+
+  console.log(games.length, "remove game");
+  console.log(players.length, 'remove payers');
+
+  
+}
 const nextQuiz = (gameInfo) => { // only for owner user
   var gameUsers = getGamePlayers(gameInfo);
   var gameContent = getGame(gameInfo);
@@ -354,5 +374,6 @@ module.exports = {
   startQuiz,
   toMidState,
   reJoinGame,
-  updateAnswer
+  updateAnswer,
+  endGameMake
 };

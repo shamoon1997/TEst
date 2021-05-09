@@ -37,7 +37,8 @@ import {
   onMessageReceived, offEvent, emitEvent, setSocket
 } from 'src/utils/socket';
 import stringify from 'src/utils/stringify';
-
+import notifyMefunction from 'src/utils/noti';
+import global from 'src/utils/global';
 import CustomerMsg from './CustomerMsg';
 import MyMsg from './MyMsg';
 import Users from './Users';
@@ -256,6 +257,7 @@ const CustomerListView = () => {
         if (user.u_id == newMsg.from_id) {
           console.log('increase new message num');
           temp[index].newMsgNum = user.newMsgNum + 1;
+          notifyMefunction(newMsg.msgContent[0].m_content, user.u_avatar ? `${global.serverUrl}upload/${user.u_avatar}` : null);
         }
       });
 

@@ -14,10 +14,11 @@ import {
   colors
 } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
 const useStyles = makeStyles(() => ({
-  root: {}
+  root: {
+    height: '100%'
+  }
 }));
 
 const Sales = ({ className, ...rest }) => {
@@ -30,11 +31,6 @@ const Sales = ({ className, ...rest }) => {
         backgroundColor: colors.indigo[500],
         data: [18, 5, 19, 27, 29, 19, 20],
         label: 'This year'
-      },
-      {
-        backgroundColor: colors.grey[200],
-        data: [11, 20, 12, 29, 30, 25, 13],
-        label: 'Last year'
       }
     ],
     labels: ['1 Aug', '2 Aug', '3 Aug', '4 Aug', '5 Aug', '6 Aug']
@@ -110,7 +106,7 @@ const Sales = ({ className, ...rest }) => {
             Last 7 days
           </Button>
         )}
-        title="Latest Sales"
+        title="Latest Usages"
       />
       <Divider />
       <CardContent>
@@ -124,21 +120,6 @@ const Sales = ({ className, ...rest }) => {
           />
         </Box>
       </CardContent>
-      <Divider />
-      <Box
-        display="flex"
-        justifyContent="flex-end"
-        p={2}
-      >
-        <Button
-          color="primary"
-          endIcon={<ArrowRightIcon />}
-          size="small"
-          variant="text"
-        >
-          Overview
-        </Button>
-      </Box>
     </Card>
   );
 };

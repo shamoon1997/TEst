@@ -961,3 +961,16 @@ button.game-ok:active::before {
   justify-content: center;
   align-items: center;
 }
+.answerResultContain {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+.answer-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center
+}

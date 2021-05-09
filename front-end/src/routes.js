@@ -13,6 +13,7 @@ import ProductListView from 'src/views/product/ProductListView';
 import RegisterView from 'src/views/auth/RegisterView';
 import About from 'src/views/aboutus/About';
 import LoginView from 'src/views/auth/LoginView';
+import AdminLoginView from 'src/views/auth/AdminLoginView';
 import SettingsView from 'src/views/settings/SettingsView';
 import NewQuiz from 'src/views/product/ProductListView/newQuiz';
 import Collections from 'src/views/collection';
@@ -25,12 +26,15 @@ import AuthProtect from 'src/components/AuthProtect';
 import StudentHome from 'src/views/student/quiz';
 import Membership from 'src/views/membership';
 import MembershipStu from 'src/views/student/membership';
+import CustomerListView from 'src/views/customer/CustomerListView';
+import TransactionListView from 'src/views/transaction/TransactionListView';
+import ContactListView from 'src/views/contactData/ContactListView';
 import QuizLayout from './layouts/QuizLayout';
 import QuizLayoutStu from './layouts/QuizLayoutStu';
+import AdminLayout from './layouts/AdminLayout';
 import OnlyHeaderLayout from './layouts/OnlyHeaderLayout';
 import ClassLayout from './layouts/ClassLayout';
 import StudentLayout from './layouts/StudentLayout';
-
 // import StoreContext from 'src/context/index';
 
 // const { store } = React.useContext(StoreContext);
@@ -156,6 +160,27 @@ const routes = [
       { path: '*', element: <Navigate to="/teacher/404" /> }
     ]
   },
+  {
+    path: 'admin',
+    element: <AdminLayout />,
+    children: [
+      { path: '/', element: <DashboardView /> },
+      { path: 'main', element: <DashboardView /> },
+      { path: 'users', element: <CustomerListView /> },
+      { path: 'transaction_history', element: <TransactionListView /> },
+      { path: 'contact', element: <ContactListView /> },
+      { path: '404', element: <NotFoundView /> },
+      { path: '*', element: <Navigate to="/teacher/404" /> }
+    ]
+  },
+  {
+    path: 'admin',
+    children: [
+      { path: 'signin', element: <AdminLoginView /> },
+      { path: '404', element: <NotFoundView /> },
+      { path: '*', element: <Navigate to="/404" /> }
+    ]
+  }
 ];
 
 export default routes;

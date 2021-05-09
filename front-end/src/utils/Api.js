@@ -34,6 +34,114 @@ export async function signIn(userInfo) {
   return DATA;
 }
 
+export async function adminSignIn(userInfo) {
+  const DATA = await Axios.post('adminsignin', userInfo).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  });
+  return DATA;
+}
+
+export async function getUserData() {
+  const DATA = await Axios.post('getuserdata').then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  });
+  return DATA;
+}
+
+export async function toggleUserStateApi(data) {
+  const DATA = await Axios.post('toggleUserStatus', data).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  });
+  return DATA;
+}
+
+export async function getTransactionData() {
+  const DATA = await Axios.post('gettransactions').then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  });
+  return DATA;
+}
+
+export async function resendVerifyCode(data) {
+  const DATA = await Axios.post('resendverifycode', data).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  });
+  return DATA;
+}
+
+export async function getContactData() {
+  const DATA = await Axios.post('getcontactdata').then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  });
+  return DATA;
+}
+
+export async function emailVerify(data) {
+  const DATA = await Axios.post('emailverify', data).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  });
+  return DATA;
+}
+
+export async function getNewContactData() {
+  const DATA = await Axios.post('getnewcontactdata').then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  });
+  return DATA;
+}
+
+export async function getDashboardInfo() {
+  const DATA = await Axios.post('getDashboardInfo').then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  }).catch((err) => {
+    console.log(err);
+  });
+  return DATA;
+}
+
 export async function newQuiz(data) {
   const DATA = await Axios.post('newquiz', data).then((res) => {
     if (res.status === 200) {
@@ -203,6 +311,16 @@ export async function updateColData(data) {
   return DATA;
 }
 
+export async function sendContactAnswer(data) {
+  const DATA = await Axios.post('sendcontactanswer', data).then((res) => {
+    if (res.status === 200) {
+      return res.data.data;
+    }
+    cogoToast.warn('Add Failed', { position: 'bottom-right' });
+    return res.data.data;
+  });
+  return DATA;
+}
 // ============= Class sectioin
 export async function newClass(data) {
   const DATA = await Axios.post('newclass', data).then((res) => {
@@ -340,6 +458,16 @@ export async function membershipUpgradeApi(data) {
 
 export async function joinMemApi(data) {
   const DATA = await Axios.post('joinmem', data).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  });
+  return DATA;
+}
+
+export async function requestContact(data) {
+  const DATA = await Axios.post('contact', data).then((res) => {
     if (res.status === 200) {
       return res.data;
     }

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import moment from 'moment';
-import { v4 as uuid } from 'uuid';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import PropTypes from 'prop-types';
+import { NavLink as RouterLink } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -22,69 +22,6 @@ import {
 } from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
-const data = [
-  {
-    id: uuid(),
-    ref: 'CDD1049',
-    amount: 30.5,
-    customer: {
-      name: 'Ekaterina Tankova'
-    },
-    createdAt: 1555016400000,
-    status: 'pending'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1048',
-    amount: 25.1,
-    customer: {
-      name: 'Cao Yu'
-    },
-    createdAt: 1555016400000,
-    status: 'delivered'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1047',
-    amount: 10.99,
-    customer: {
-      name: 'Alexa Richardson'
-    },
-    createdAt: 1554930000000,
-    status: 'refunded'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1046',
-    amount: 96.43,
-    customer: {
-      name: 'Anje Keizer'
-    },
-    createdAt: 1554757200000,
-    status: 'pending'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1045',
-    amount: 32.54,
-    customer: {
-      name: 'Clarke Gillebert'
-    },
-    createdAt: 1554670800000,
-    status: 'delivered'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1044',
-    amount: 16.76,
-    customer: {
-      name: 'Adam Denisov'
-    },
-    createdAt: 1554670800000,
-    status: 'delivered'
-  }
-];
-
 const useStyles = makeStyles(() => ({
   root: {},
   actions: {
@@ -92,16 +29,15 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const LatestOrders = ({ className, ...rest }) => {
+const LatestOrders = ({ className, latestUsers, ...rest }) => {
   const classes = useStyles();
-  const [orders] = useState(data);
 
   return (
     <Card
       className={clsx(classes.root, className)}
       {...rest}
     >
-      <CardHeader title="Latest Orders" />
+      <CardHeader title="Newest Users" />
       <Divider />
       <PerfectScrollbar>
         <Box minWidth={800}>
@@ -109,10 +45,16 @@ const LatestOrders = ({ className, ...rest }) => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  Order Ref
+                  User id
                 </TableCell>
                 <TableCell>
-                  Customer
+                  User Name
+                </TableCell>
+                <TableCell>
+                  Email
+                </TableCell>
+                <TableCell>
+                  User Type
                 </TableCell>
                 <TableCell sortDirection="desc">
                   <Tooltip
@@ -133,24 +75,30 @@ const LatestOrders = ({ className, ...rest }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.map((order) => (
+              {latestUsers.map((user) => (
                 <TableRow
                   hover
-                  key={order.id}
+                  key={user.u_id}
                 >
                   <TableCell>
-                    {order.ref}
+                    {user.u_id}
                   </TableCell>
                   <TableCell>
-                    {order.customer.name}
+                    {user.u_name}
                   </TableCell>
                   <TableCell>
-                    {moment(order.createdAt).format('DD/MM/YYYY')}
+                    {user.u_email}
+                  </TableCell>
+                  <TableCell>
+                    {user.u_type}
+                  </TableCell>
+                  <TableCell>
+                    {moment(user.u_created_at ? user.u_created_at : null).format('dddd, MMMM Do YYYY, h:m:ss a')}
                   </TableCell>
                   <TableCell>
                     <Chip
                       color="primary"
-                      label={order.status}
+                      label={user.u_status}
                       size="small"
                     />
                   </TableCell>
@@ -170,6 +118,8 @@ const LatestOrders = ({ className, ...rest }) => {
           endIcon={<ArrowRightIcon />}
           size="small"
           variant="text"
+          component={RouterLink}
+          to="/admin/users"
         >
           View all
         </Button>
@@ -179,7 +129,8 @@ const LatestOrders = ({ className, ...rest }) => {
 };
 
 LatestOrders.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+  latestUsers: PropTypes.array
 };
 
 export default LatestOrders;

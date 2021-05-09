@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -17,6 +18,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  CircularProgress,
   DialogContentText
 } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
@@ -27,8 +29,13 @@ import EditIcon from '@material-ui/icons/Edit';
 import MenuBookIcon from '@material-ui/icons/MenuBook';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Zoom from 'react-reveal/Zoom';
+import cogoToast from 'cogo-toast';
 import humanFriendlyDate from 'src/utils/Timeformat';
-import { deleteColApi } from 'src/utils/Api';
+import {
+  emitEvent
+} from 'src/utils/socket';
+import global from 'src/utils/global';
+import { deleteColApi, getQuizById } from 'src/utils/Api';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,6 +66,13 @@ const useStyles = makeStyles((theme) => ({
   },
   teach: {
     marginLeft: 20
+  },
+  draft: {
+    color: 'white',
+    height: 23,
+    backgroundColor: 'indigo',
+    borderRadius: 5,
+    lineHeight: '23px'
   }
 }));
 
@@ -69,7 +83,10 @@ const ProductCard = ({
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState('');
+  const [makingGame, setMakingGame] = useState(false);
   const [hostModal, setHostModal] = useState(false);
+  const [gameType, setGameType] = useState('');
+  const [gamePin, setGamePin] = useState(0);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const handleMenuClick = (event) => {
@@ -85,11 +102,64 @@ const ProductCard = ({
     navigate(`/collection/edit?id=${id}`, { replace: true });
     handleMenuClose();
   };
-  const toggleHostModal = () => {
+  const toggleHostModal = (gType) => {
+    setGameType(gType);
+    console.log(gType);
     setHostModal(!hostModal);
   };
   const gotoGamePanel = () => {
-    toggleHostModal();
+    console.log(gamePin);
+    setGamePin(false);
+    setHostModal(false);
+    window.open(global.gamePageUrl, '_black');
+  };
+  const createGame = () => {
+    setMakingGame(true);
+    console.log(product, gameType);
+    setTimeout(async () => {
+      console.log(product);
+      const quizzes = [];
+      const questions = JSON.parse(product.questions);
+      for (let i = 0; i < questions.length; i++) {
+        console.log(questions[i].id, quizzes, getQuizById);
+        await getQuizById({ id: questions[i].id }).then((res) => {
+          if (res.length) {
+            console.log(res);
+            quizzes.push(...JSON.parse(res[0].q_content));
+          } else {
+            cogoToast.warn('There was an erro, Please try again', { position: 'top-right' });
+          }
+        });
+      }
+      console.log(quizzes, 'quizzes');
+      const user = JSON.parse(localStorage.getItem('brainaly_user'));
+      const gameInfo = {
+        ownerId: user.userId,
+        ownerType: user.userType,
+        gameType,
+        gameQuizNum: quizzes.length,
+        gameContent: quizzes,
+        gameStatus: 'ready',
+        gameId: Math.random().toString(16).slice(-4),
+        sourceType: 'quiz',
+        sourceId: product.id
+      };
+      const gameUser = {
+        userId: user.userId,
+        userNickName: user.userName,
+        currentNum: 0,
+        userScore: 0,
+        userStatus: 'ready',
+        gameId: gameInfo.gameId,
+        userAnswers: []
+      };
+      console.log(gameUser);
+      emitEvent('createGame', gameInfo);
+      setGamePin(gameInfo.gameId);
+      localStorage.setItem('brainaly_game', JSON.stringify(gameUser));
+      setMakingGame(false);
+      setHostModal(false);
+    }, 500);
   };
   const deleteQu = (id) => {
     console.log(id);
@@ -109,6 +179,25 @@ const ProductCard = ({
   }
   return (
     <div>
+      <Dialog
+        open={gamePin}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        key="hostModal"
+      >
+        <DialogTitle id="alert-dialog-title">Game is Created</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Please share this PIN with your friends
+            <p style={{ fontSize: 18 }}>{ gamePin }</p>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={gotoGamePanel} color="primary" variant="contained">
+            Go Game
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog
         open={dialogOpen}
         onClose={handleClose}
@@ -144,8 +233,9 @@ const ProductCard = ({
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={gotoGamePanel} color="primary" variant="contained">
+          <Button color="primary" variant="contained" onClick={createGame}>
             Host
+            {makingGame && <CircularProgress color="nice" size={20} className="progress" />}
           </Button>
         </DialogActions>
       </Dialog>
@@ -192,10 +282,10 @@ const ProductCard = ({
               >
                 <Grid
                   item
-                  xl={11}
-                  lg={11}
-                  md={11}
-                  xs={11}
+                  xl={10}
+                  lg={10}
+                  md={10}
+                  xs={10}
                 >
                   <Typography
                     align="left"
@@ -212,6 +302,16 @@ const ProductCard = ({
                   >
                     {product.description}
                   </Typography>
+                </Grid>
+                <Grid
+                  item
+                  xl={1}
+                  lg={1}
+                  md={1}
+                  xs={1}
+                  className={product.quizNum ? null : classes.draft}
+                >
+                  {product.quizNum ? null : 'Draft'}
                 </Grid>
                 <Grid
                   item
@@ -305,11 +405,8 @@ const ProductCard = ({
                 className={classes.statsItem}
                 item
               >
-                <Button variant="contained" color="primary" onClick={toggleHostModal}>
+                <Button variant="contained" color="primary" onClick={() => { toggleHostModal('play'); }} disabled={!product.quizNum}>
                   Play
-                </Button>
-                <Button variant="contained" color="secondary" className={classes.teach}>
-                  Teach
                 </Button>
               </Grid>
             </Grid>

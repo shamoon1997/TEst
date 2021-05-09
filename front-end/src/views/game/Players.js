@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     width: '100vw',
     position: 'fixed',
     bottom: 0,
-    height: 350,
+    height: 250,
     overflow: 'hidden',
     display: 'flex',
     justifyContent: 'center'
@@ -101,7 +101,7 @@ const Players = ({ playersData, gameContent, userInfo }) => {
         {
           playersData?.map((player, index) => {
             return (
-              (gameContent?.ownerId == userInfo?.userId && gameContent?.gameType == 'teach')
+              (player?.userId == gameContent?.ownerId)
                 ? null : (
                 <Grid
                   key={uuid()}
@@ -114,9 +114,6 @@ const Players = ({ playersData, gameContent, userInfo }) => {
                 >
                   <Card className="player-card">
                     <CardContent className="player-card">
-                      <Typography className={classes.title} color="textSecondary" gutterBottom>
-                        Word of the Day
-                      </Typography>
                       <Typography variant="h2" component="h2">
                         {player.userNickName}
                       </Typography>

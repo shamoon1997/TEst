@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable no-shadow */
 /* eslint-disable no-redeclare */
 /* eslint-disable block-scoped-var */
@@ -167,6 +168,11 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-around',
     alignItems: 'center',
+  },
+  answerHeader: {
+    marginBottom: 30,
+    color: 'white',
+    fontSize: 36
   }
 }));
 
@@ -223,53 +229,161 @@ const GamePanel = () => {
   function updateAnswerView(uInfo) {
     var gameCorrectAnswers = gameInfo.gameContent[uInfo.currentNum];
     console.log(gameCorrectAnswers, uInfo.currentNum, uInfo.userAnswers, 'display answer result');
-    var userAnswer = uInfo.userAnswers[uInfo.currentNum];
     if (gameCorrectAnswers.quizType === 1) {
-      setAnswerResultView(
-        <Grid container className={classes.answerResultContainer}>
-          <Grid item sm={12} className={classes.subanswerResult}>
-          <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector1}>
-{gameCorrectAnswers.quizAnswer[0].sel == userAnswer[0] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+      var countAnswer = [0, 0, 0, 0];
+    } else {
+      var countAnswer = [0, 0];
+    }
+    players.map((p) => {
+      console.log(p);
+      var pAnswer = p.userAnswers[uInfo.currentNum];
+      pAnswer.map((ans, index) => {
+        countAnswer[index] += ans;
+      });
+    });
+    var userAnswer = uInfo.userAnswers[uInfo.currentNum];
+    if (playerInfo.userId != gameInfo.ownerId) {
+      if (gameCorrectAnswers.quizType === 1) {
+        setAnswerResultView(
+          <Grid container className={classes.answerResultContainer}>
+            <Grid item sm={12} className={classes.answerHeader}>
+              <h1>{gameInfo?.gameContent ? gameInfo?.gameContent[playerInfo.currentNum].title : null}</h1>
+            </Grid>
+            <Grid item sm={12} className={classes.subanswerResult}>
+            <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector1}>
+  {gameCorrectAnswers.quizAnswer[0].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+              {gameCorrectAnswers.quizAnswer[0].answer}
+            </Grid>
+            <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector2}>
+  {gameCorrectAnswers.quizAnswer[1].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+  {gameCorrectAnswers.quizAnswer[1].answer}
+            </Grid>
+            </Grid>
+  <Grid item sm={12} className={classes.subanswerResult}>
+  <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector3}>
+  {gameCorrectAnswers.quizAnswer[2].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+  {gameCorrectAnswers.quizAnswer[2].answer}
+  </Grid>
+            <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector4}>
+  {gameCorrectAnswers.quizAnswer[3].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+  {gameCorrectAnswers.quizAnswer[3].answer}
+            </Grid>
+  </Grid>
 
           </Grid>
-          <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector2}>
-{gameCorrectAnswers.quizAnswer[1].sel == userAnswer[1] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-
+        );
+      } else if (gameCorrectAnswers.quizType === 2) {
+        if (gameCorrectAnswers.quizAnswer == 1) {
+          var correctAnswer = [0, 1];
+        } else {
+          var correctAnswer = [1, 0];
+        }
+        setAnswerResultView(
+          <Grid container className={classes.answerResultContainer}>
+            <Grid item sm={12} className={classes.answerHeader}>
+              <h1>{gameInfo?.gameContent ? gameInfo?.gameContent[playerInfo.currentNum].title : null}</h1>
+            </Grid>
+            <Grid item md={6} sm={6} xs={6} className={classes.answerResultSector1}>
+  {correctAnswer[0] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+            </Grid>
+            <Grid item md={6} sm={6} xs={6} className={classes.answerResultSector2}>
+  {correctAnswer[1] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+            </Grid>
           </Grid>
-          </Grid>
-<Grid item sm={12} className={classes.subanswerResult}>
-<Grid item md={3} sm={3} xs={3} className={classes.answerResultSector3}>
-{gameCorrectAnswers.quizAnswer[2].sel == userAnswer[2] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-
-</Grid>
-          <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector4}>
-{gameCorrectAnswers.quizAnswer[3].sel == userAnswer[3] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-
-          </Grid>
-</Grid>
-
-        </Grid>
-      );
-    } else if (gameCorrectAnswers.quizType === 2) {
-      if (gameCorrectAnswers.quizAnswer == 1) {
-        var correctAnswer = [0, 1];
-      } else {
-        var correctAnswer = [1, 0];
+        );
       }
-      setAnswerResultView(
-        <Grid container className={classes.answerResultContainer}>
-          <Grid item md={6} sm={6} xs={6} className={classes.answerResultSector1}>
-{userAnswer[0] == correctAnswer[0] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-        {userAnswer[0]}
-        {gameCorrectAnswers.quizAnswer}
+    } else {
+      if (gameCorrectAnswers.quizType === 1) {
+        setAnswerResultView(
+          <Grid container className={classes.answerResultContainer}>
+            <Grid item sm={12} className={classes.answerHeader}>
+              <h1>{gameInfo?.gameContent ? gameInfo?.gameContent[playerInfo.currentNum].title : null}</h1>
+            </Grid>
+            <Grid item sm={12} className={classes.subanswerResult}>
+            <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector1}>
+              <div className="answerResultContain">
+                <div className="answer-item">
+                {gameCorrectAnswers.quizAnswer[0].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                {gameCorrectAnswers.quizAnswer[0].answer}
+                </div>
+                <div>
+                  {countAnswer[0]}
+                </div>
+              </div>
+            </Grid>
+            <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector2}>
+              <div className="answerResultContain">
+                <div className="answer-item">
+                {gameCorrectAnswers.quizAnswer[1].sel == userAnswer[1] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                {gameCorrectAnswers.quizAnswer[1].answer}
+                </div>
+                <div>
+                  {countAnswer[1]}
+                </div>
+              </div>
+            </Grid>
+            </Grid>
+          <Grid item sm={12} className={classes.subanswerResult}>
+          <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector3}>
+              <div className="answerResultContain">
+                <div className="answer-item">
+                {gameCorrectAnswers.quizAnswer[2].sel == userAnswer[2] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+  {gameCorrectAnswers.quizAnswer[2].answer}
+                </div>
+                <div>
+                  {countAnswer[2]}
+                </div>
+              </div>
           </Grid>
-          <Grid item md={6} sm={6} xs={6} className={classes.answerResultSector2}>
-{userAnswer[1] == correctAnswer[1] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-        {userAnswer[1]}
-        {gameCorrectAnswers.quizAnswer}
+            <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector4}>
+              <div className="answerResultContain">
+                <div className="answer-item">
+                {gameCorrectAnswers.quizAnswer[3].sel == userAnswer[3] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+  {gameCorrectAnswers.quizAnswer[3].answer}
+                </div>
+                <div>
+                  {countAnswer[3]}
+                </div>
+              </div>
+            </Grid>
           </Grid>
-        </Grid>
-      );
+
+          </Grid>
+        );
+      } else if (gameCorrectAnswers.quizType === 2) {
+        if (gameCorrectAnswers.quizAnswer == 1) {
+          var correctAnswer = [0, 1];
+        } else {
+          var correctAnswer = [1, 0];
+        }
+        setAnswerResultView(
+          <Grid container className={classes.answerResultContainer}>
+            <Grid item sm={12} className={classes.answerHeader}>
+              <h1>{gameInfo?.gameContent ? gameInfo?.gameContent[playerInfo.currentNum].title : null}</h1>
+            </Grid>
+            <Grid item md={6} sm={6} xs={6} className={classes.answerResultSector1}>
+              <div className="answerResultContain">
+                <div className="answer-item">
+                {userAnswer[0] == correctAnswer[0] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                </div>
+                <div>
+                  {countAnswer[0]}
+                </div>
+              </div>
+            </Grid>
+            <Grid item md={6} sm={6} xs={6} className={classes.answerResultSector2}>
+              <div className="answerResultContain">
+                <div className="answer-item">
+                {userAnswer[1] == correctAnswer[1] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                </div>
+                <div>
+                  {countAnswer[1]}
+                </div>
+              </div>
+            </Grid>
+          </Grid>
+        );
+      }
     }
   }
   function togglePinModal() {
@@ -328,10 +442,10 @@ const GamePanel = () => {
       setAnswerResult([0, 0, 0, 0]);
       setAnswerGraphic(
         <Grid container className={classes.answerContainer}>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[0] === 'undefined' ? null : <Unchecked answer={answers[0].answer} order={0} check={answers[0].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[1] === 'undefined' ? null : <Unchecked answer={answers[1].answer} order={1} check={answers[1].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[2] === 'undefined' ? null : <Unchecked answer={answers[2].answer} order={2} check={answers[2].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[3] === 'undefined' ? null : <Unchecked answer={answers[3].answer} order={3} check={answers[3].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[0] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[0].answer} order={0} check={answers[0].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[1] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[1].answer} order={1} check={answers[1].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[2] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[2].answer} order={2} check={answers[2].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[3] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[3].answer} order={3} check={answers[3].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
         </Grid>
       );
     } else if (quizType === 2) {
@@ -339,7 +453,7 @@ const GamePanel = () => {
       const answers = gameInfo?.gameContent[currentNum]?.quizAnswer;
       setAnswerGraphic(
         <Grid container className={classes.answerContainer}>
-          { typeof answers === 'undefined' ? null : <Checked order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }
+          { typeof answers === 'undefined' ? null : <Checked owner={playerInfo.userId == gameInfo.ownerId} order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }
           {/* <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers === 'undefined' ? null : <Checked order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} /> }</Grid> */}
         </Grid>
       );
@@ -364,10 +478,10 @@ const GamePanel = () => {
       setAnswerResult([0, 0, 0, 0]);
       setAnswerGraphic(
         <Grid container className={classes.answerContainer}>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[0] === 'undefined' ? null : <Unchecked answer={answers[0].answer} order={0} check={answers[0].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[1] === 'undefined' ? null : <Unchecked answer={answers[1].answer} order={1} check={answers[1].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[2] === 'undefined' ? null : <Unchecked answer={answers[2].answer} order={2} check={answers[2].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[3] === 'undefined' ? null : <Unchecked answer={answers[3].answer} order={3} check={answers[3].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[0] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[0].answer} order={0} check={answers[0].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[1] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[1].answer} order={1} check={answers[1].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[2] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[2].answer} order={2} check={answers[2].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[3] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[3].answer} order={3} check={answers[3].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
         </Grid>
       );
     } else if (quizType === 2) {
@@ -375,7 +489,7 @@ const GamePanel = () => {
       const answers = gameInfo?.gameContent[currentNum]?.quizAnswer;
       setAnswerGraphic(
         <Grid container className={classes.answerContainer}>
-          { typeof answers === 'undefined' ? null : <Checked order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }
+          { typeof answers === 'undefined' ? null : <Checked owner={playerInfo.userId == gameInfo.ownerId} order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }
           {/* <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers === 'undefined' ? null : <Checked order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} /> }</Grid> */}
         </Grid>
       );
@@ -579,6 +693,16 @@ const GamePanel = () => {
   //     });
   //   }
   // }, [setUploadAnswerValueRequest]);
+  function endGame() {
+    emitEvent('endGame', gameInfo.gameId);
+  }
+  function completeGame() {
+    localStorage.removeItem('brainaly_game');
+    setGamePinModal(true);
+    setGameInfo({});
+    setPlayers([]);
+    console.log('endGame');
+  }
   React.useEffect(() => {
     window.addEventListener('beforeunload', (event) => {
       event.returnValue = 'Hellooww';
@@ -592,10 +716,12 @@ const GamePanel = () => {
     // offEvent('sendSerAnswer');
     offEvent('okPinCode');
     offEvent('noPinCode');
+    offEvent('endedGame');
     onMessageReceived('rejoinGame', reJoinGame);
     onMessageReceived('newUserJoined', updatePlayers);
     onMessageReceived('updatedGameInfo', updateGameInfo);
     onMessageReceived('okPinCode', okPinCode);
+    onMessageReceived('endedGame', completeGame);
     // onMessageReceived('sendSerAnswer', uploadAnswer);
     onMessageReceived('noPinCode', noPinCode);
     const currentUser = JSON.parse(localStorage.getItem('brainaly_game'));
@@ -759,7 +885,7 @@ const GamePanel = () => {
         (playerInfo.userId == gameInfo.ownerId && gameInfo.gameStatus == 'playing' && downTime == 0) ? <button className="game-ok next" onClick={toMidGame}>View Mid Result</button> : null
       }
       {
-        (playerInfo.userId == gameInfo.ownerId && gameInfo.gameStatus == 'end') ? <button className="game-ok next" onClick={toMidGame}>End</button> : null
+        (playerInfo.userId == gameInfo.ownerId && gameInfo.gameStatus == 'end') ? <button className="game-ok next" onClick={endGame}>End</button> : null
       }
       {
         playerInfo.userStatus == 'mid' ? answerResultView : null

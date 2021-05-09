@@ -1,4 +1,5 @@
 /* eslint-disable react/react-in-jsx-scope */
+import React from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import PropTypes from 'prop-types';
 import { CircularLoading } from 'respinner';
@@ -8,14 +9,17 @@ import { CircularLoading } from 'respinner';
 const CheckoutForm = ({ payinfo, isLoading }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const [getLoading, setGetLoading] = React.useState(false);
 
   const handleSubmit = async (event) => {
     // Block native form submission.
+    setGetLoading(true);
     event.preventDefault();
 
     if (!stripe || !elements) {
       // Stripe.js has not loaded yet. Make sure to disable
       // form submission until Stripe.js has loaded.
+      setGetLoading(false);
       return;
     }
 
@@ -38,6 +42,7 @@ const CheckoutForm = ({ payinfo, isLoading }) => {
       console.log('[PaymentMethod]', paymentMethod);
       payinfo(result);
     }
+    setGetLoading(false);
   };
 
   return (
@@ -45,7 +50,7 @@ const CheckoutForm = ({ payinfo, isLoading }) => {
       <CardElement />
       <div className="payButton-container">
         {
-            isLoading ? <CircularLoading fill="#01025C" stroke="#01025C" /> : (
+            isLoading || getLoading ? <CircularLoading fill="#01025C" stroke="#01025C" /> : (
               <button type="submit" disabled={!stripe} className="payButton" id="button-7">
                 <div id="dub-arrow">
                   <img src="https://github.com/atloomer/atloomer.github.io/blob/master/img/iconmonstr-arrow-48-240.png?raw=true" alt="pay" />

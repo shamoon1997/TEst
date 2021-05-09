@@ -54,7 +54,8 @@ const ProductList = () => {
             description: res.result[i].col_description,
             id: res.result[i].col_uid,
             created: res.result[i].col_created_at,
-            quizNum: JSON.parse(res.result[i].col_quiz).length
+            quizNum: JSON.parse(res.result[i].col_quiz).length,
+            questions: res.result[i].col_quiz
           };
           productsArray.push(newData);
           console.log(res.result[i]);
@@ -79,7 +80,8 @@ const ProductList = () => {
           description: res.result[i].col_description,
           id: res.result[i].col_uid,
           created: res.result[i].col_created_at,
-          quizNum: JSON.parse(res.result[i].col_quiz).length
+          quizNum: JSON.parse(res.result[i].col_quiz).length,
+          questions: res.result[i].col_quiz
         };
         productsArray.push(newData);
         console.log(res.result[i]);
@@ -103,7 +105,8 @@ const ProductList = () => {
           description: res.result[i].col_description,
           id: res.result[i].col_uid,
           created: res.result[i].col_created_at,
-          quizNum: JSON.parse(res.result[i].col_quiz).length
+          quizNum: JSON.parse(res.result[i].col_quiz).length,
+          questions: res.result[i].col_quiz
         };
         productsArray.push(newData);
         console.log(res.result[i]);
@@ -133,7 +136,8 @@ const ProductList = () => {
           description: res.result[i].col_description,
           id: res.result[i].col_uid,
           created: res.result[i].col_created_at,
-          quizNum: JSON.parse(res.result[i].col_quiz).length
+          quizNum: JSON.parse(res.result[i].col_quiz).length,
+          questions: res.result[i].col_quiz
         };
         productsArray.push(newData);
         console.log(res.result[i]);

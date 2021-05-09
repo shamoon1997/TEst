@@ -103,7 +103,7 @@ const LoginView = () => {
                       } else if (res.data.u_type === 'student') {
                         navigate('/student/home', { replace: true });
                       } else {
-                        // navigate('/', { replace: true });
+                      // navigate('/', { replace: true });
                       }
                     }, 1500);
                   } else {
@@ -237,6 +237,16 @@ const LoginView = () => {
                       variant="h6"
                     >
                       Sign up
+                    </Link>
+                    {' '}
+                    Or
+                    {' '}
+                    <Link
+                      component={RouterLink}
+                      to="/verifyemail"
+                      variant="h6"
+                    >
+                      Verify
                     </Link>
                   </Typography>
                 </form>

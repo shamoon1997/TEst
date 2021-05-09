@@ -39,6 +39,7 @@
     "@stripe/react-stripe-js": "^1.4.0",
     "@stripe/stripe-js": "^1.13.2",
     "axios": "^0.21.1",
+    "canvas-confetti": "^1.4.0",
     "chart.js": "^2.9.4",
     "clsx": "^1.1.1",
     "cogo-toast": "^4.2.3",
@@ -85,7 +86,6 @@
     ],
     "plugins": [
       "@babel/plugin-syntax-jsx"
-      
     ]
   },
   "devDependencies": {

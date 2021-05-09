@@ -53,8 +53,10 @@ const {
   updateAnswer,
   nextQuiz,
   toMidState,
+  endGameMake,
   reJoinGame
 } = require('./socketGame/game');
+const { ENGINE_METHOD_PKEY_ASN1_METHS } = require("constants");
 io.on("connection", function(socket) {
   console.log('new connection of socket');
   socket.emit('rejoinGame');
@@ -124,6 +126,10 @@ io.on("connection", function(socket) {
   socket.on('sendMessage',async (msg) => {
     console.log(msg);
     newMessage(msg, socket);
+  })
+
+  socket.on('endGame', (gameId)=>{
+    endGameMake(gameId)
   })
 
   socket.on('disconnect', ()=>{

@@ -18,8 +18,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  CircularProgress,
-  DialogContentText
+  DialogContentText,
+  CircularProgress
 } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
@@ -141,7 +141,7 @@ const ProductCard = ({
   };
   const gotoGamePanel = () => {
     console.log(gamePin);
-    // setGamePin(false);
+    setGamePin(false);
     setHostModal(false);
     window.open(global.gamePageUrl, '_black');
   };
@@ -381,11 +381,8 @@ const ProductCard = ({
                 className={classes.statsItem}
                 item
               >
-                <Button variant="contained" color="primary" onClick={() => { toggleHostModal('play'); }}>
+                <Button variant="contained" color="secondary" onClick={() => { toggleHostModal('play'); }}>
                   Play
-                </Button>
-                <Button variant="contained" color="secondary" className={classes.teach} onClick={() => { toggleHostModal('teach'); }}>
-                  Teach
                 </Button>
               </Grid>
             </Grid>

@@ -28,7 +28,7 @@ import {
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Page from 'src/components/Page';
-import { signUp } from 'src/utils/Api';
+import { requestContact } from 'src/utils/Api';
 import cogoToast from 'cogo-toast';
 
 const useStyles = makeStyles((theme) => ({
@@ -77,24 +77,24 @@ const Contact = () => {
               initialValues={{
                 email: '',
                 firstName: '',
-                userName: '',
+                title: '',
                 message: '',
                 policy: false
               }}
               validationSchema={
               Yup.object().shape({
                 email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                userName: Yup.string().max(255).required('Name is required'),
+                title: Yup.string().max(255).required('Name is required'),
                 message: Yup.string().max(255).required('Message is required')
               })
             }
               onSubmit={async (values) => {
                 console.log(values);
                 setIsLoading(true);
-                signUp({
-                  userEmail: values.email,
-                  userName: values.userName,
-                  userPwd: values.message,
+                requestContact({
+                  contactEmail: values.email,
+                  contactTitle: values.title,
+                  contactMessage: values.message,
                   userType: accountType
                 }).then((res) => {
                   if (typeof res === 'undefined') cogoToast.error('SignUp Failed', { position: 'top-right' });
@@ -102,13 +102,11 @@ const Contact = () => {
                     cogoToast.success(res.msg, { position: 'bottom-right' });
                     setTimeout(() => {
                       setIsLoading(false);
-                      navigate('/signin', { replace: true });
                     }, 1500);
                   } else {
                     setIsLoading(false);
-                    cogoToast.warn(res.msg, { position: 'bottom-right' });
+                    cogoToast.warn('Sorry, There was a issue, Please contact Admin', { position: 'bottom-right' });
                   }
-                  console.log(res, 'in front - end');
                 }).catch((res) => {
                   setIsLoading(false);
                 });
@@ -140,15 +138,15 @@ const Contact = () => {
                     </Typography>
                   </Box>
                   <TextField
-                    error={Boolean(touched.userName && errors.userName)}
+                    error={Boolean(touched.title && errors.title)}
                     fullWidth
-                    helperText={touched.userName && errors.userName}
-                    label="Name"
+                    helperText={touched.title && errors.title}
+                    label="Title"
                     margin="normal"
-                    name="userName"
+                    name="title"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.userName}
+                    value={values.title}
                     variant="outlined"
                   />
                   <TextField
