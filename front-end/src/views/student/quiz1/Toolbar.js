@@ -229,7 +229,7 @@ const Toolbar = ({ className, ...rest }) => {
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <div className={classes.coverImage}>
+              <div className={classes.coverImage}>  
                 <input type="file" id="image_select" accept="image/x-png,image/gif,image/jpeg" onChange={handleImageChange} className={classes.fileModal} />
                 <Typography variant="body1">
                   Cover image
