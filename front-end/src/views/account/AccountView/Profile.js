@@ -110,7 +110,7 @@ const Profile = ({ className, ...rest }) => {
       </CardContent>
       <Divider />
       <CardActions>
-        <input type="file" id="image_select" onChange={(event) => { handleImageChange(event); }} className={classes.fileModal} />
+        <input type="file" id="image_select" accept="image/x-png,image/gif,image/jpeg" onChange={(event) => { handleImageChange(event); }} className={classes.fileModal} />
         <Button
           color="primary"
           fullWidth

@@ -280,7 +280,7 @@ export default function NewQuiz() {
       <div className={classes.cart}>
         <div className={classes[imageLetter]}>
           <div className={classes.previews} onClick={imageSelect}>
-            <input type="file" id="image_select" onChange={handleImageChange} className={classes.fileModal} />
+            <input type="file" id="image_select" accept="image/x-png,image/gif,image/jpeg" onChange={handleImageChange} className={classes.fileModal} />
             <ImageSearchIcon fontSize="large" />
             <Typography variant="body1" color="primary" component="h2" style={{ textAlign: 'center' }}>
               Drag and Drop Event image here
