@@ -50,7 +50,8 @@ const ProductList = () => {
             description: res.result[i].q_description,
             id: res.result[i].q_uid,
             media: res.result[i].q_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].q_cover}`,
-            created: res.result[i].q_created_at
+            created: res.result[i].q_created_at,
+            played: res.result[i].q_play_num
           };
           productsArray.push(newData);
           console.log(res.result[i]);
@@ -77,7 +78,8 @@ const ProductList = () => {
           description: res.result[i].q_description,
           id: res.result[i].q_uid,
           media: res.result[i].q_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].q_cover}`,
-          created: res.result[i].q_created_at
+          created: res.result[i].q_created_at,
+          played: res.result[i].q_play_num
         };
         productsArray.push(newData);
       }
@@ -107,7 +109,8 @@ const ProductList = () => {
           description: res.result[i].q_description,
           id: res.result[i].q_uid,
           media: res.result[i].q_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].q_cover}`,
-          created: res.result[i].q_created_at
+          created: res.result[i].q_created_at,
+          played: res.result[i].q_play_num
         };
         productsArray.push(newData);
       }
@@ -140,7 +143,8 @@ const ProductList = () => {
           description: res.result[i].q_description,
           id: res.result[i].q_uid,
           media: res.result[i].q_cover === '' ? '/static/collection.png' : `${global.serverUrl}upload/${res.result[i].q_cover}`,
-          created: res.result[i].q_created_at
+          created: res.result[i].q_created_at,
+          played: res.result[i].q_play_num
         };
         productsArray.push(newData);
       }

@@ -113,7 +113,7 @@ io.on("connection", function(socket) {
   })
   
   socket.on('updateAnswer', (data)=>{
-    console.log('start quiz in server.js', data)
+    console.log('update game answer', data)
     updateAnswer(data);
   })
 

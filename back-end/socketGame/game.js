@@ -65,11 +65,27 @@ const reJoinGame = (data, socket) => {
 const updateAnswer = (data) => {
   const { playerInfo, upData } = data;
   // console.log(playerInfo, upData);
+  var temp = [];
+
   players.forEach(function (a) {
     if (a.userId == playerInfo.userId) {
-      a.userAnswers[playerInfo.currentNum] = upData;
+      var gameAnswer = getGameAnswer(playerInfo);
+      console.log(gameAnswer);
+      var tempAnswer = upData;
+      if(gameAnswer.quizType != 2){
+        gameAnswer.quizAnswer.map((item, index)=>{
+          if(typeof tempAnswer[index] == 'undefined'){
+            tempAnswer[index] = 0;
+          }
+        });
+      }
+      a.userAnswers[playerInfo.currentNum] = tempAnswer;
+      console.log(a.userAnswers[playerInfo.currentNum]);
     }
-  })
+    temp.push(a);
+  });
+  players = [...temp]
+  console.log(players);
 }
 const joinGame = (data, socket) => {
   var flag = false;
@@ -204,25 +220,26 @@ const getGameAnswer = (userInfo) => {
   // console.log("+++++++game anser", gameAnswers);
   return gameAnswers;
 }
-const calCheckAnswer = (userInfo, answerResult) => {
+const calCheckAnswer = (userInfo, quizNum) => {
   // console.log('cac & check answer', userInfo, answerResult);
   var gameAnswer = getGameAnswer(userInfo);
+  var userAnswers = userInfo.userAnswers[quizNum];
   var flag = true;
   // console.log(gameAnswer, 'question answer in calcheckanswer');
   if (typeof gameAnswer != 'undefined') {
-    
+    console.log(userInfo, userAnswers, gameAnswer, 'in cal check function')
     if (gameAnswer.quizType == 2) {
-      if (answerResult[gameAnswer.quizAnswer] != 1) {
+      if (userAnswers[gameAnswer.quizAnswer] == 1) {
         flag = false;
       }
     } else {
       gameAnswer.quizAnswer.map((gA, index) => {
-        if (gA.sel != answerResult[index]) {
+        if (gA.sel != userAnswers[index]) {
           flag = false;
         }
       })
     }
-
+    console.log(flag, "calculation result ++++++++++++++++")
     if (flag) {
       // points 3 == no, poinst 2 == double poinst 1 = standard
       if (gameAnswer.point == 3) {
@@ -248,22 +265,21 @@ const toMidState = (playerInfo, answerResult) => {
   var gameUsers = getGamePlayers(playerInfo);
   var gameContent = getGame(playerInfo);
   var flag = 'mid';
-  // gameUsers.map(gameU => {
-  //   emitEvent('sendSerAnswer', gameContent, gameU.userId);
-  // })
+  
   if(playerInfo.currentNum >= gameContent.gameContent.length){
     flag = 'end'
   }
-  // console.log("-to mide", playerInfo, answerResult);
+  
   if (ownerCheck(playerInfo)) {
-    // console.log("-owner of game")
+  
     players.forEach(function (a) {
-      if (a.userId == playerInfo.userId) {
+  
         a.userStatus = flag;
         if(flag == 'mid')
-        a.userScore += calCheckAnswer(playerInfo, answerResult);
-        a.userAnswers[playerInfo.currentNum] = answerResult;
-      }
+        a.userScore = Number(a.userScore) + calCheckAnswer(a, playerInfo.currentNum);
+        console.log(a.userScore, 'calculation of usre score');
+        // a.userAnswers[playerInfo.currentNum] = answerResult;
+      // }
     })
     setTimeout(() => {
       games.forEach(function (g) {

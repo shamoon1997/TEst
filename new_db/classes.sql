@@ -30,12 +30,7 @@ CREATE TABLE `classes` (
   `cl_user_id` int(11) DEFAULT NULL,
   `cl_createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`cl_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
-
-/*Data for the table `classes` */
-
-insert  into `classes`(`cl_id`,`cl_uid`,`cl_cover`,`cl_name`,`cl_description`,`cl_students`,`cl_user_id`,`cl_createdAt`) values 
-(7,'7aca4745-0923-1622-e781-7261f4721205','','123123123123123','123123123123123123123123','[9,10]',5,'2021-04-17 04:14:50');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

@@ -94,7 +94,7 @@ const EndGameSection = ({ game, playersInfo, userInfo }) => {
     });
     let criterion = 0
     var tempPlayers = playersInfo.filter((a)=>{
-      return a.userId != userInfo.userId
+      return a.userId != game.ownerId
     })
     tempPlayers.map((p, index) => {
       if (p.userId == data.userId) {

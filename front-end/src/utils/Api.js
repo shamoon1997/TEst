@@ -221,6 +221,7 @@ export async function imageUpload(file) {
   const res = await Axios.post('/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
+      'Access-Control-Allow-Origin': '*'
     },
   });
   return res;
@@ -234,6 +235,7 @@ export async function deleteQuiz(id) {
   });
   return DATA;
 }
+
 // =============Collection alalal
 
 export async function newCollection(data) {
@@ -468,6 +470,16 @@ export async function joinMemApi(data) {
 
 export async function requestContact(data) {
   const DATA = await Axios.post('contact', data).then((res) => {
+    if (res.status === 200) {
+      return res.data;
+    }
+    return res.data;
+  });
+  return DATA;
+}
+
+export async function playedGame(data) {
+  const DATA = await Axios.post('playedgame', data).then((res) => {
     if (res.status === 200) {
       return res.data;
     }

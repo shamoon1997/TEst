@@ -23,7 +23,6 @@ import {
 } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import EditIcon from '@material-ui/icons/Edit';
 import MenuBookIcon from '@material-ui/icons/MenuBook';
@@ -373,19 +372,6 @@ const ProductCard = ({
                   Created at
                   {' '}
                   {humanFriendlyDate(product.created)}
-                </Typography>
-                <PlayArrowIcon
-                  className={classes.statsIcon}
-                  color="action"
-                />
-                <Typography
-                  color="textSecondary"
-                  display="inline"
-                  variant="body2"
-                >
-                  {product.totalDownloads}
-                  {' '}
-                  Plays
                 </Typography>
                 <MenuBookIcon
                   className={classes.statsIcon}

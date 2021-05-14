@@ -8,39 +8,45 @@ const nodemailer = require('nodemailer');
 
 const stripe = require("stripe")("sk_test_51IPvrnIAaIJ9dA25lOk4dDB0RRLvkDYb1LF9pITxtcl67oiVpoHA3tycYgnUn01SDHmg8VAIzhOUaDfxV7JpMN4X00Odeh68UU");
 const mysql = require('mysql');
+
 const host = 'localhost';
 const user = 'root';
 const password = '';
 const database = 'brainaly';
+
+// server invironment
+// const host = 'localhost';
+// const user = 'admin';
+// const password = 'ABCabc!@12';
+// const database = 'brainaly';
+
 var saltRounds = 10;
 var limitNum = 5;
 
-function sendEmail(fromEmail, toEmail, answer){
+function sendEmail(fromEmail, toEmail, answer) {
 
   try {
     var transOptions = {
-        host: 'mail.authsmtp.com',
-        port: 25,
-        secure: false,
-        auth: {
-            user: 'AKIA6BJXWIW4XL7LLQ4K',
-            pass: 'BB1/NNzyGLOoIl7/RIiEX8d5Eb9GSItjqik/tz2Tchcp'
-        }
+      service: 'gmail',
+      auth: {
+        user: 'azzipcirolac@gmail.com',
+        pass: 'asdwds3210'
+      }
     };
     var transporter = nodemailer.createTransport(transOptions);
     var mainOptions = {
-        from: fromEmail,
-        to: toEmail,
-        subject: 'Contact Answer',
-        text: answer
+      from: fromEmail,
+      to: toEmail,
+      subject: 'Contact Answer',
+      text: answer
     };
 
-    transporter.sendMail(mainOptions, function(error, info){
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
+    transporter.sendMail(mainOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
     });
     console.log("sent email successfully")
   } catch (error) {
@@ -86,6 +92,7 @@ var storage = multer.diskStorage({
 var upload = multer({
   storage: storage
 }).single('file')
+
 //====== Image upload
 router.post("/upload", async (req, res) => {
   upload(req, res, function (err) {
@@ -187,8 +194,9 @@ router.post("/signup", async (req, res) => {
             } else {
               //$2a$10$FEBywZh8u9M0Cec/0mWep.1kXrwKeiWDba6tdKvDfEBjyePJnDT7K
               var verifyCode = Math.random().toString(16).slice(-4);
-              sendEmail('info@brainaly.com', userEmail, verifyCode+'\nFrom Brainaly Support');
-              const query1 = "INSERT INTO `users` (`u_name`, `u_email`, `u_pwd`, `u_type`, `u_email_verify_code`) VALUES ('" + userName + "', '" + userEmail + "', '" + hash + "', '" + userType + "', '"+verifyCode+"'); ";
+              sendEmail('info@brainaly.com', userEmail, verifyCode + '\nFrom Brainaly Support');
+              console.log(verifyCode);
+              const query1 = "INSERT INTO `users` (`u_name`, `u_email`, `u_pwd`, `u_type`, `u_email_verify_code`) VALUES ('" + userName + "', '" + userEmail + "', '" + hash + "', '" + userType + "', '" + verifyCode + "'); ";
               con.query(query1, (err, result, fields) => {
                 if (err) throw err;
                 res.json({
@@ -238,7 +246,7 @@ router.post("/signin", async (req, res) => {
             res.send();
           }
         })
-      } else if(result[0].u_status == 'pending') {
+      } else if (result[0].u_status == 'pending') {
         res.json({
           flag: false,
           data: result[0],
@@ -417,8 +425,8 @@ router.post("/resendverifycode", async (req, res) => {
   // get latest users
   console.log(req.body);
   var verifyCode = Math.random().toString(16).slice(-4);
-  var query = "UPDATE `users` SET `u_email_verify_code`= '"+verifyCode+"' WHERE `u_email` = '" + req.body.userEmail + "'";
-  sendEmail('info@brainaly.com', req.body.userEmail, verifyCode+"\nFrom Brainalry");
+  var query = "UPDATE `users` SET `u_email_verify_code`= '" + verifyCode + "' WHERE `u_email` = '" + req.body.userEmail + "'";
+  sendEmail('info@brainaly.com', req.body.userEmail, verifyCode + "\nFrom Brainalry");
   await con.query(query, (err, result) => {
     if (err) throw err;
     res.json({
@@ -433,12 +441,12 @@ router.post("/resendverifycode", async (req, res) => {
 router.post("/emailverify", async (req, res) => {
   // get latest users
   console.log(req.body);
-  var query = "SELECT * FROM users where u_email = '"+req.body.userEmail+"'";
+  var query = "SELECT * FROM users where u_email = '" + req.body.userEmail + "'";
   await con.query(query, (err, result) => {
     if (err) throw err;
     console.log(result);
-    if(result.length){
-      if(result[0].u_email_verify_code == req.body.code){
+    if (result.length) {
+      if (result[0].u_email_verify_code == req.body.code) {
         query = "UPDATE `users` SET `u_email_verified`= 1 WHERE `u_email` = '" + req.body.userEmail + "'";
         runQuery(query);
         res.json({
@@ -463,7 +471,7 @@ router.post("/emailverify", async (req, res) => {
       })
       res.send();
     }
-    
+
   });
 });
 
@@ -471,11 +479,11 @@ router.post("/getcontactdata", async (req, res) => {
   var query = "SELECT * FROM contact_data";
   console.log("update user status");
   var contacts = []
-  contacts =await runQuery(query);
+  contacts = await runQuery(query);
   console.log(contacts);
   var contactsResult = []
-  for(var i = 0; i < contacts.length; i++){
-    query = "SELECT * FROM contact_response WHERE contact_id = "+contacts[i].id;
+  for (var i = 0; i < contacts.length; i++) {
+    query = "SELECT * FROM contact_response WHERE contact_id = " + contacts[i].id;
     console.log(query);
     contactsResult[i] = {
       ...contacts[i],
@@ -488,18 +496,18 @@ router.post("/getcontactdata", async (req, res) => {
     result: contactsResult,
     msg: "fetch success",
   })
-  res.send();  
+  res.send();
 })
 
 router.post("/getnewcontactdata", async (req, res) => {
   var query = "SELECT * FROM (SELECT contact_data.*, contact_response.contact_id FROM contact_data LEFT JOIN contact_response ON contact_response.contact_id = contact_data.id ) newData WHERE newData.contact_id IS NULL";
   console.log("update user status");
   var contacts = []
-  contacts =await runQuery(query);
+  contacts = await runQuery(query);
   console.log(contacts);
   var contactsResult = []
-  for(var i = 0; i < contacts.length; i++){
-    query = "SELECT * FROM contact_response WHERE contact_id = "+contacts[i].id;
+  for (var i = 0; i < contacts.length; i++) {
+    query = "SELECT * FROM contact_response WHERE contact_id = " + contacts[i].id;
     console.log(query);
     contactsResult[i] = {
       ...contacts[i],
@@ -512,13 +520,13 @@ router.post("/getnewcontactdata", async (req, res) => {
     result: contactsResult,
     msg: "fetch success",
   })
-  res.send();  
+  res.send();
 
 })
 
 router.post("/sendcontactanswer", async (req, res) => {
   console.log(req.body)
-  sendEmail('info@brainaly.com', req.body.emailAddress, req.body.adminAnswer+'\nFrom Brainaly Support');
+  sendEmail('info@brainaly.com', req.body.emailAddress, req.body.adminAnswer + '\nFrom Brainaly Support');
   const query = "INSERT INTO `contact_response` (`contact_id`, `response`) VALUES  ('" + req.body.contactId + "', '" + req.body.adminAnswer + "');";
   await con.query(query, (err, result, fields) => {
     if (err) throw err;
@@ -1177,6 +1185,21 @@ router.post("/membershipUpgrade", async (req, res) => {
         msg: "There was a error, Please check your CardInfo Or contact Admin!"
       });
     });
+});
+
+router.post("/playedgame", async (req, res) => {
+  console.log(req.body.gameId);
+  var query = "SELECT * FROM `questions` WHERE `q_uid` = '" + req.body.gameId + "'";
+  var question = await runQuery(query);
+  console.log(question, "question result of palyedgame");
+  query = "UPDATE `questions` SET `q_play_num`='" + (Number(question[0].q_play_num) + 1) + "' WHERE `q_uid` = '" + req.body.gameId + "'";
+  await con.query(query, (err, result) => {
+    if (err) throw err;
+    res.json({
+      data: result,
+      message: 'success'
+    })
+  });
 });
 
 module.exports = router;

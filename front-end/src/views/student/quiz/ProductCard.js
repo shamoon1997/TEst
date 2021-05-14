@@ -359,7 +359,7 @@ const ProductCard = ({
                   display="inline"
                   variant="body2"
                 >
-                  {product.totalDownloads}
+                  {product.played ? product.played : 0}
                   {' '}
                   Plays
                 </Typography>

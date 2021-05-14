@@ -37,7 +37,7 @@ import {
   onMessageReceived,
   offEvent
 } from 'src/utils/socket';
-import { signUp } from 'src/utils/Api';
+import { signUp, playedGame } from 'src/utils/Api';
 import cogoToast from 'cogo-toast';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import ClearIcon from '@material-ui/icons/Clear';
@@ -242,7 +242,7 @@ const GamePanel = () => {
       });
     });
     var userAnswer = uInfo.userAnswers[uInfo.currentNum];
-    if (playerInfo.userId != gameInfo.ownerId) {
+    if (playerInfo.userId == gameInfo.ownerId) {
       if (gameCorrectAnswers.quizType === 1) {
         setAnswerResultView(
           <Grid container className={classes.answerResultContainer}>
@@ -251,25 +251,52 @@ const GamePanel = () => {
             </Grid>
             <Grid item sm={12} className={classes.subanswerResult}>
             <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector1}>
-  {gameCorrectAnswers.quizAnswer[0].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-              {gameCorrectAnswers.quizAnswer[0].answer}
+              <div className="answerResultContain">
+                <div className="answer-item">
+                  {gameCorrectAnswers.quizAnswer[0].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                  {gameCorrectAnswers.quizAnswer[0].answer}
+                </div>
+                <div>
+                  {countAnswer[0]}
+                </div>
+              </div>
             </Grid>
             <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector2}>
-  {gameCorrectAnswers.quizAnswer[1].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-  {gameCorrectAnswers.quizAnswer[1].answer}
+              <div className="answerResultContain">
+                <div className="answer-item">
+                  {gameCorrectAnswers.quizAnswer[1].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                  {gameCorrectAnswers.quizAnswer[1].answer}
+                </div>
+                <div>
+                  {countAnswer[1]}
+                </div>
+              </div>
             </Grid>
             </Grid>
-  <Grid item sm={12} className={classes.subanswerResult}>
-  <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector3}>
-  {gameCorrectAnswers.quizAnswer[2].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-  {gameCorrectAnswers.quizAnswer[2].answer}
-  </Grid>
+            <Grid item sm={12} className={classes.subanswerResult}>
+            <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector3}>
+              <div className="answerResultContain">
+                <div className="answer-item">
+                  {gameCorrectAnswers.quizAnswer[2].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                  {gameCorrectAnswers.quizAnswer[2].answer}
+                </div>
+                <div>
+                  {countAnswer[2]}
+                </div>
+              </div>
+            </Grid>
             <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector4}>
-  {gameCorrectAnswers.quizAnswer[3].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-  {gameCorrectAnswers.quizAnswer[3].answer}
+              <div className="answerResultContain">
+                <div className="answer-item">
+                  {gameCorrectAnswers.quizAnswer[3].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                  {gameCorrectAnswers.quizAnswer[3].answer}
+                </div>
+                <div>
+                  {countAnswer[3]}
+                </div>
+              </div>
             </Grid>
-  </Grid>
-
+            </Grid>
           </Grid>
         );
       } else if (gameCorrectAnswers.quizType === 2) {
@@ -284,16 +311,31 @@ const GamePanel = () => {
               <h1>{gameInfo?.gameContent ? gameInfo?.gameContent[playerInfo.currentNum].title : null}</h1>
             </Grid>
             <Grid item md={6} sm={6} xs={6} className={classes.answerResultSector1}>
-  {correctAnswer[0] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+              <div className="answerResultContain">
+                <div className="answer-item">
+                {correctAnswer[1] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                </div>
+                <div>
+                  {countAnswer[0]}
+                </div>
+              </div>
             </Grid>
             <Grid item md={6} sm={6} xs={6} className={classes.answerResultSector2}>
-  {correctAnswer[1] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+              <div className="answerResultContain">
+                <div className="answer-item">
+                {correctAnswer[0] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                </div>
+                <div>
+                  {countAnswer[1]}
+                </div>
+              </div>
             </Grid>
           </Grid>
         );
       }
     } else {
       if (gameCorrectAnswers.quizType === 1) {
+        console.log(userAnswer, 'user answer and correct answer');
         setAnswerResultView(
           <Grid container className={classes.answerResultContainer}>
             <Grid item sm={12} className={classes.answerHeader}>
@@ -303,11 +345,8 @@ const GamePanel = () => {
             <Grid item md={3} sm={3} xs={3} className={classes.answerResultSector1}>
               <div className="answerResultContain">
                 <div className="answer-item">
-                {gameCorrectAnswers.quizAnswer[0].sel ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
+                {gameCorrectAnswers.quizAnswer[0].sel == userAnswer[0] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
                 {gameCorrectAnswers.quizAnswer[0].answer}
-                </div>
-                <div>
-                  {countAnswer[0]}
                 </div>
               </div>
             </Grid>
@@ -317,9 +356,6 @@ const GamePanel = () => {
                 {gameCorrectAnswers.quizAnswer[1].sel == userAnswer[1] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
                 {gameCorrectAnswers.quizAnswer[1].answer}
                 </div>
-                <div>
-                  {countAnswer[1]}
-                </div>
               </div>
             </Grid>
             </Grid>
@@ -328,10 +364,7 @@ const GamePanel = () => {
               <div className="answerResultContain">
                 <div className="answer-item">
                 {gameCorrectAnswers.quizAnswer[2].sel == userAnswer[2] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-  {gameCorrectAnswers.quizAnswer[2].answer}
-                </div>
-                <div>
-                  {countAnswer[2]}
+                {gameCorrectAnswers.quizAnswer[2].answer}
                 </div>
               </div>
           </Grid>
@@ -339,23 +372,20 @@ const GamePanel = () => {
               <div className="answerResultContain">
                 <div className="answer-item">
                 {gameCorrectAnswers.quizAnswer[3].sel == userAnswer[3] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-  {gameCorrectAnswers.quizAnswer[3].answer}
-                </div>
-                <div>
-                  {countAnswer[3]}
+                {gameCorrectAnswers.quizAnswer[3].answer}
                 </div>
               </div>
             </Grid>
           </Grid>
-
           </Grid>
         );
       } else if (gameCorrectAnswers.quizType === 2) {
         if (gameCorrectAnswers.quizAnswer == 1) {
-          var correctAnswer = [0, 1];
-        } else {
           var correctAnswer = [1, 0];
+        } else {
+          var correctAnswer = [0, 1];
         }
+        console.log(userAnswer, correctAnswer, 'user answer and correct answer');
         setAnswerResultView(
           <Grid container className={classes.answerResultContainer}>
             <Grid item sm={12} className={classes.answerHeader}>
@@ -366,18 +396,12 @@ const GamePanel = () => {
                 <div className="answer-item">
                 {userAnswer[0] == correctAnswer[0] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
                 </div>
-                <div>
-                  {countAnswer[0]}
-                </div>
               </div>
             </Grid>
             <Grid item md={6} sm={6} xs={6} className={classes.answerResultSector2}>
               <div className="answerResultContain">
                 <div className="answer-item">
                 {userAnswer[1] == correctAnswer[1] ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <ClearIcon fontSize="large" className={classes.icons} />}
-                </div>
-                <div>
-                  {countAnswer[1]}
                 </div>
               </div>
             </Grid>
@@ -393,12 +417,8 @@ const GamePanel = () => {
     console.log(downTime, 'downtime');
     if (downTime <= 0) {
       timeIsUp();
-      if (gameInfo?.gameContent) {
-        // emitEvent('toMidState', {
-        //   playerInfo,
-        //   answerResult
-        // });
-      }
+      // if (gameInfo?.gameContent) {
+      // }
       for (var i = 0; i < 1000; i++) {
         window.clearInterval(i);
       }
@@ -417,6 +437,7 @@ const GamePanel = () => {
   function countDown() {
     setDownTime((downTime) => downTime - 1);
   }
+
   function setAnswerResultcall(upData) {
     console.log(upData, 'on index');
     emitEvent('updateAnswer', {
@@ -440,23 +461,27 @@ const GamePanel = () => {
     if (quizType === 1) {
       const answers = gameInfo?.gameContent[currentNum]?.quizAnswer;
       setAnswerResult([0, 0, 0, 0]);
-      setAnswerGraphic(
-        <Grid container className={classes.answerContainer}>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[0] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[0].answer} order={0} check={answers[0].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[1] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[1].answer} order={1} check={answers[1].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[2] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[2].answer} order={2} check={answers[2].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-          <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[3] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[3].answer} order={3} check={answers[3].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
-        </Grid>
-      );
+      setTimeout(() => {
+        setAnswerGraphic(
+          <Grid container className={classes.answerContainer}>
+            <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[0] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[0].answer} order={0} check={answers[0].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+            <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[1] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[1].answer} order={1} check={answers[1].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+            <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[2] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[2].answer} order={2} check={answers[2].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+            <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers[3] === 'undefined' ? null : <Unchecked owner={playerInfo.userId == gameInfo.ownerId} answer={answers[3].answer} order={3} check={answers[3].sel} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }</Grid>
+          </Grid>
+        );
+      }, 300);
     } else if (quizType === 2) {
       setAnswerResult([0, 0]);
       const answers = gameInfo?.gameContent[currentNum]?.quizAnswer;
-      setAnswerGraphic(
-        <Grid container className={classes.answerContainer}>
-          { typeof answers === 'undefined' ? null : <Checked owner={playerInfo.userId == gameInfo.ownerId} order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }
-          {/* <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers === 'undefined' ? null : <Checked order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} /> }</Grid> */}
-        </Grid>
-      );
+      setTimeout(() => {
+        setAnswerGraphic(
+          <Grid container className={classes.answerContainer}>
+            { typeof answers === 'undefined' ? null : <Checked owner={playerInfo.userId == gameInfo.ownerId} order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} timeCount={downTime} /> }
+            {/* <Grid item md={6} sm={6} xs={12} className={classes.answerSector}>{ typeof answers === 'undefined' ? null : <Checked order={1} check={answers === 0 ? 1 : 0} updateAnswer={setAnswerResultcall} cAnswer={answerResult} /> }</Grid> */}
+          </Grid>
+        );
+      }, 300);
     }
   }
   React.useEffect(() => {
@@ -673,6 +698,9 @@ const GamePanel = () => {
   }
   function StartGame() {
     console.log('start gaem');
+    playedGame({
+      gameId: gameInfo.sourceId
+    });
     emitEvent('startQuiz', gameInfo, playerInfo);
   }
   function reJoinGame() {
@@ -811,18 +839,18 @@ const GamePanel = () => {
       {/* top title */}
       {
         (gameInfo.gameStatus === 'ready') ? (
-<Grid
-  container
-  spacing={3}
-  justify="space-around"
-  className={classes.header}
->
           <Grid
-            item
+            container
+            spacing={3}
+            justify="space-around"
+            className={classes.header}
           >
-            <h1>Waiting for Users</h1>
+            <Grid
+              item
+            >
+              <h1>Waiting for Users</h1>
+            </Grid>
           </Grid>
-</Grid>
         ) : null
       }
 
@@ -838,21 +866,21 @@ const GamePanel = () => {
 
       {
         playerInfo.userStatus == 'playing' ? (
-<Grid
-  container
-  spacing={3}
-  justify="space-around"
-  className={classes.header}
->
           <Grid
-            item
+            container
+            spacing={3}
+            justify="space-around"
+            className={classes.header}
           >
-            <>
-              <h1>{gameInfo?.gameContent ? gameInfo?.gameContent[playerInfo.currentNum].title : null}</h1>
-              <img src={`${global.serverUrl}upload/${gameInfo?.gameContent ? gameInfo?.gameContent[playerInfo.currentNum].image : null}`} className="quiz-image" />
-            </>
+            <Grid
+              item
+            >
+              <>
+                <h1>{gameInfo?.gameContent ? gameInfo?.gameContent[playerInfo.currentNum].title : null}</h1>
+                <img src={`${global.serverUrl}upload/${gameInfo?.gameContent ? gameInfo?.gameContent[playerInfo.currentNum].image : null}`} className="quiz-image" />
+              </>
+            </Grid>
           </Grid>
-</Grid>
         ) : null
       }
       {

@@ -30,16 +30,7 @@ CREATE TABLE `collections` (
   `col_user_id` int(11) DEFAULT NULL,
   `col_created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`col_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
-
-/*Data for the table `collections` */
-
-insert  into `collections`(`col_id`,`col_name`,`col_description`,`col_image`,`col_quiz`,`col_uid`,`col_user_id`,`col_created_at`) values 
-(1,'test col','text collections','1618243195071-avatar.jpg','[{\"id\":\"b3aa93fc-9026-d507-3e9c-8b6396fd09c2\"}]','b3997e29-55be-5956-531e-c0e61dd4b3ea',NULL,'2021-04-14 12:20:54'),
-(4,'34534','53453453453445345345345345345345','','[{\"id\":\"3ab461fd-20ff-585a-4303-270ac7121d3d\"},{\"id\":\"db94c37e-27b3-104b-261d-958b0a1c0a94\"}]','b12354fa-36f1-4165-d319-24d3f476eb95',1,'2021-04-14 12:20:54'),
-(5,'qweqw','qweqweqweqweqwe',NULL,NULL,NULL,NULL,'2021-04-14 12:20:54'),
-(6,'qweq','weqweqweqweqweqeqweqwe','','[]','2b117799-c6c6-fb4d-c84b-251ca72bca32',1,'2021-04-14 12:20:54'),
-(8,'123','123123123123123123123','','[]','54e6156d-014a-da39-b7ce-af0733c313a6',5,'2021-04-15 21:50:33');
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

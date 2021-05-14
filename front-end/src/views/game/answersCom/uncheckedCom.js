@@ -82,7 +82,6 @@ export default function UncheckedCom({
               className={classes.checking}
             >
               {cAnswer[order] == 1 ? <CheckCircleIcon fontSize="large" className={classes.icons} /> : <RadioButtonUncheckedIcon fontSize="large" className={classes.icons} />}
-              {cAnswer[order]}
             </IconButton>
           </div>
         </div>
